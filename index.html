@@ -3,37 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <title>UPI Payment</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="payment-box">
-    <div class="header">
-      <img src="https://img.icons8.com/color/48/000000/shopping-bag.png" />
-      <span class="title">PAPAYA CODERS PRIVATE LIMITED</span>
-      <span class="amount">₹1</span>
+  <div class="container">
+    <h2>Select UPI App</h2>
+    <div class="upi-option">
+      <label><input type="radio" name="upiApp" value="phonepe@upi" checked> PhonePe</label>
+      <label><input type="radio" name="upiApp" value="gpay@okaxis"> Google Pay</label>
+      <label><input type="radio" name="upiApp" value="paytm@paytm"> Paytm</label>
     </div>
 
     <div class="qr-section">
-      <h3>Show QR Code</h3>
-      <p>Scan with any UPI app</p>
-      <img class="qr" id="qrCode" src="" alt="QR Code">
-      <p class="status">Checking payment status… <span id="timer">15:00</span></p>
+      <h3>Scan to Pay</h3>
+      <img id="qrImage" src="" alt="QR Code" width="200">
+      <p><strong>UPI ID:</strong> <span id="upi-id">Loading...</span></p>
+      <p id="timer">Time Left: 15:00</p>
     </div>
 
-    <div class="upi-apps">
-      <h4>Select UPI App</h4>
-      <label><input type="radio" name="upiApp" value="phonepe" checked> PhonePe</label>
-      <label><input type="radio" name="upiApp" value="gpay"> Google Pay</label>
-      <label><input type="radio" name="upiApp" value="paytm"> Paytm</label>
-    </div>
+    <button id="payBtn">Pay Now</button>
+    <button id="confirmPayment">I Have Paid</button>
 
-    <p class="powered">Powered by <b>PhonePe</b></p>
-
-    <button id="payButton">PAY ₹1</button>
+    <p id="status" style="margin-top: 20px;"></p>
   </div>
 
-  <!-- Firebase -->
   <script type="module" src="firebase-config.js"></script>
-  <script src="script.js" type="module"></script>
+  <script src="utils.js"></script>
+  <script>
+    let selectedUpi = "phonepe@upi";
+    const qrImage = document.getElementById("qrImage");
+    const upiSpan = document.getElementById("upi-id");
+    const statusText = document.getElementById("status");
+    const confirmBtn = document.getElementById("confirmPayment");
+    const timerEl = document.getElementById("timer");
+
+    // Generate QR
+    function updateQR(upiId) {
+      const amount = 10;
+      const upiUri = `upi://pay?pa=${upiId}&pn=Brijesh&cu=INR&am=${amount}`;
+      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiUri)}&size=200x200`;
+      upiSpan.innerText = upiId;
+      selectedUpi = upiId;
+    }
+
+    // UPI radio change
+    document.querySelectorAll('input[name="upiApp"]').forEach((el) => {
+      el.addEventListener("change", () => updateQR(el.value));
+    });
+
+    // Initial QR
+    updateQR(selectedUpi);
+
+    // Countdown timer
+    let time = 15 * 60;
+    const timer = setInterval(() => {
+      const min = String(Math.floor(time / 60)).padStart(2, "0");
+      const sec = String(time % 60).padStart(2, "0");
+      timerEl.innerText = `Time Left: ${min}:${sec}`;
+      if (time <= 0) {
+        clearInterval(timer);
+        statusText.innerText = "Time expired. Please try again.";
+        confirmBtn.disabled = true;
+      }
+      time--;
+    }, 1000);
+
+    // Payment confirm
+    confirmBtn.addEventListener("click", () => {
+      const txnId = `TXN_${Date.now()}`;
+      const data = {
+        id: txnId,
+        upi: selectedUpi,
+        amount: 10,
+        status: "pending",
+        createdAt: new Date().toISOString()
+      };
+      saveTransaction(data);
+      statusText.innerText = "Checking payment status...";
+      simulateVerify(txnId);
+    });
+  </script>
 </body>
 </html>
