@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPI Payment</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="payment-box">
+    <div class="header">
+      <img src="https://img.icons8.com/color/48/000000/shopping-bag.png" />
+      <span class="title">PAPAYA CODERS PRIVATE LIMITED</span>
+      <span class="amount">₹1</span>
+    </div>
+
+    <div class="qr-section">
+      <h3>Show QR Code</h3>
+      <p>Scan with any UPI app</p>
+      <img class="qr" id="qrCode" src="" alt="QR Code">
+      <p class="status">Checking payment status… <span id="timer">15:00</span></p>
+    </div>
+
+    <div class="upi-apps">
+      <h4>Select UPI App</h4>
+      <label><input type="radio" name="upiApp" value="phonepe" checked> PhonePe</label>
+      <label><input type="radio" name="upiApp" value="gpay"> Google Pay</label>
+      <label><input type="radio" name="upiApp" value="paytm"> Paytm</label>
+    </div>
+
+    <p class="powered">Powered by <b>PhonePe</b></p>
+
+    <button id="payButton">PAY ₹1</button>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module" src="firebase-config.js"></script>
+  <script src="script.js" type="module"></script>
+</body>
+</html>
