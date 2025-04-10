@@ -1,0 +1,114 @@
+body {
+  background: #f1f1f1;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.payment-box {
+  background: #fff;
+  border-radius: 14px;
+  width: 360px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.1);
+  padding: 20px;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.header img {
+  width: 30px;
+}
+
+.title {
+  font-size: 14px;
+  flex-grow: 1;
+  margin: 0 10px;
+  text-align: left;
+}
+
+.amount {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.qr-section {
+  margin: 20px 0;
+}
+
+.qr {
+  width: 150px;
+  height: 150px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.status {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+#timer {
+  color: green;
+  font-weight: bold;
+}
+
+.upi-apps {
+  text-align: left;
+  margin: 20px 0;
+}
+
+.upi-apps h4 {
+  margin-bottom: 10px;
+}
+
+.upi-apps label {
+  display: block;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.pay-options {
+  text-align: left;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.pay-options p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.powered {
+  font-size: 13px;
+  color: #999;
+  margin: 15px 0;
+}
+
+button {
+  background: #888;
+  color: white;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #666;
+}
