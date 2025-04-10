@@ -3,16 +3,232 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="admin.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101010;
+      color: white;
+      padding: 20px;
+    }
+
+    .admin-container {
+      max-width: 900px;
+      margin: auto;
+      background: #1f1f1f;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2c2c2c;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .top-bar button {
+      background: red;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .filters input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #555;
+      border-radius: 6px;
+      background: #2c2c2c;
+      color: white;
+    }
+
+    .transactions {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .transaction-card {
+      background: #2b2b2b;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 5px solid #00c853;
+    }
+
+    .transaction-card p {
+      margin: 6px 0;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    button.success-btn {
+      padding: 8px 14px;
+      background: #00c853;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+  </style>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="admin-container">
-    <h2>Admin Dashboard - UPI Payments</h2>
+    <div class="top-bar">
+      <h2>Admin Dashboard</h2>
+      <button id="logoutBtn">Logout</button>
+    </div>
+
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search UPI or Txn ID">
+      <input type="date" id="dateFilter">
+    </div>
+
+    <!-- Chart -->
+    <canvas id="paymentsChart" style="margin-top: 20px; background: #222; padding: 10px; border-radius: 12px;"></canvas>
+
+    <!-- Transactions -->
     <div id="transactionList" class="transactions"></div>
   </div>
 
-  <!-- Firebase Config -->
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="admin.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
+      authDomain: "pg-data-ed1c2.firebaseapp.com",
+      projectId: "pg-data-ed1c2",
+      storageBucket: "pg-data-ed1c2.appspot.com",
+      messagingSenderId: "884858492190",
+      appId: "1:884858492190:web:67b7606ff790064ef3250f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const transactionList = document.getElementById('transactionList');
+    const searchInput = document.getElementById('searchInput');
+    const dateFilter = document.getElementById('dateFilter');
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "admin-login.html";
+    });
+
+    document.getElementById("logoutBtn").onclick = () => {
+      signOut(auth).then(() => window.location.href = "admin-login.html");
+    };
+
+    let chartInstance;
+
+    function renderChart(data) {
+      const ctx = document.getElementById('paymentsChart').getContext('2d');
+
+      const dateCounts = {};
+      Object.values(data).forEach(txn => {
+        const date = new Date(txn.createdAt).toISOString().split('T')[0];
+        dateCounts[date] = (dateCounts[date] || 0) + 1;
+      });
+
+      const labels = Object.keys(dateCounts);
+      const values = Object.values(dateCounts);
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Payments per Day',
+            data: values,
+            backgroundColor: '#00c853'
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { labels: { color: 'white' } }
+          },
+          scales: {
+            x: { ticks: { color: 'white' } },
+            y: { ticks: { color: 'white' } }
+          }
+        }
+      });
+    }
+
+    function loadTransactions() {
+      const paymentsRef = ref(db, 'payments');
+      onValue(paymentsRef, (snapshot) => {
+        transactionList.innerHTML = '';
+        const data = snapshot.val();
+        const search = searchInput.value.toLowerCase();
+        const selectedDate = dateFilter.value;
+
+        if (data) {
+          renderChart(data); // Chart function call
+
+          Object.entries(data).forEach(([txnId, txn]) => {
+            const createdAt = new Date(txn.createdAt || '');
+            const dateOnly = createdAt.toISOString().split('T')[0];
+
+            const matchesSearch =
+              txnId.toLowerCase().includes(search) ||
+              (txn.upi && txn.upi.toLowerCase().includes(search));
+            const matchesDate = !selectedDate || dateOnly === selectedDate;
+
+            if (matchesSearch && matchesDate) {
+              const card = document.createElement('div');
+              card.className = 'transaction-card';
+
+              card.innerHTML = `
+                <p><strong>Txn ID:</strong> ${txnId}</p>
+                <p><strong>UPI:</strong> ${txn.upi}</p>
+                <p><strong>Amount:</strong> ₹${txn.amount}</p>
+                <p><strong>Status:</strong> <span class="status">${txn.status}</span></p>
+                <p><strong>Date:</strong> ${createdAt.toLocaleString()}</p>
+                ${txn.status !== 'success' ? `<button class="success-btn" onclick="updateStatus('${txnId}')">Mark as Success</button>` : ''}
+              `;
+
+              transactionList.appendChild(card);
+            }
+          });
+        } else {
+          transactionList.innerHTML = "<p>No transactions found.</p>";
+        }
+      });
+    }
+
+    window.updateStatus = function (txnId) {
+      const statusRef = ref(db, `payments/${txnId}`);
+      update(statusRef, { status: 'success' }).then(() => {
+        alert(`Transaction ${txnId} marked as successful.`);
+      });
+    };
+
+    searchInput.addEventListener('input', loadTransactions);
+    dateFilter.addEventListener('change', loadTransactions);
+
+    loadTransactions();
+  </script>
 </body>
 </html>
