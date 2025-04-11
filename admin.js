@@ -19,7 +19,7 @@ const auth = getAuth(app);
 onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "admin-login.html";
 });
-
+  
 // Logout
 document.getElementById("logoutBtn").addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "admin-login.html");
