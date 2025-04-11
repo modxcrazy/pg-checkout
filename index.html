@@ -2,18 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UPI Payment</title>
+  <title>Dynamic UPI Payment</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
       padding: 30px;
-      background: #f8f9fa;
       text-align: center;
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
     }
     .upi-options {
       display: flex;
-      gap: 20px;
       justify-content: center;
+      gap: 20px;
       margin-bottom: 20px;
     }
     .upi-radio {
@@ -24,9 +29,8 @@
       border: 2px solid #ccc;
       border-radius: 10px;
       cursor: pointer;
+      background: #fff;
       transition: 0.3s;
-      background-color: #fff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .upi-radio:hover {
       border-color: #2196f3;
@@ -57,7 +61,16 @@
       font-weight: bold;
       color: #2196f3;
     }
+    #qrContainer canvas {
+      margin-top: 20px;
+      border: 6px solid #eee;
+      padding: 10px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
     #payBtn {
+      margin-top: 30px;
       padding: 12px 30px;
       font-size: 18px;
       background-color: #2196f3;
@@ -69,7 +82,7 @@
     #status {
       margin-top: 20px;
       font-size: 16px;
-      color: #333;
+      color: #555;
     }
   </style>
 </head>
@@ -95,10 +108,11 @@
     </label>
   </div>
 
+  <div id="qrContainer"></div>
+
   <button id="payBtn">Pay Now</button>
   <p id="status">Waiting for action...</p>
 
-  <!-- Firebase & Utility -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
@@ -169,6 +183,27 @@
     function triggerVibration() {
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     }
+
+    const qr = new QRious({
+      element: document.createElement("canvas"),
+      size: 220,
+      value: ""
+    });
+    document.getElementById("qrContainer").appendChild(qr.element);
+
+    async function updateQR(appName) {
+      const upiId = await fetchUPI(appName);
+      if (!upiId) return;
+      const amount = 100;
+      const upiUrl = `upi://pay?pa=${upiId}&pn=Receiver&am=${amount}&tn=Payment&cu=INR`;
+      qr.set({ value: upiUrl });
+    }
+
+    document.querySelectorAll('input[name="upiApp"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        updateQR(e.target.value);
+      });
+    });
 
     document.getElementById("payBtn").addEventListener("click", async () => {
       const selectedApp = document.querySelector('input[name="upiApp"]:checked')?.value;
