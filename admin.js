@@ -23,26 +23,23 @@ function loadTransactions() {
     const filter = document.getElementById("filterDate").value;
 
     for (const key in data) {
-      const txn = data[key];
-      const matchDate = !filter || txn.date === filter;
+  const txn = data[key];
+  const matchDate = !filter || txn.date === filter;
 
-      if (matchDate) {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-          <p><b>UTR:</b> ${txn.utr}</p>
-          <p><b>Amount:</b> ₹${txn.amount}</p>
-          <p><b>App:</b> ${txn.app || '-'}</p>
-          <p><b>Status:</b> ${txn.status}</p>
-          <p><b>Date:</b> ${txn.date}</p>
-          ${txn.status === "pending" ? `<button data-id="${key}">Approve</button>` : ''}
-        `;
-        container.appendChild(div);
-      }
+  if (matchDate) {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <span>${txn.date}</span>
+      <button onclick='approveTransaction("${key}")'>Approve</button>
+      <button onclick='showDialog(${JSON.stringify(txn)})'>View</button>
+    `;
+    container.appendChild(div);
+  }
 
-      if (txn.status === "approved") approved++;
-      if (txn.status === "pending") pending++;
-    }
+  if (txn.status === "approved") approved++;
+  if (txn.status === "pending") pending++;
+}
 
     showChart(approved, pending);
 
