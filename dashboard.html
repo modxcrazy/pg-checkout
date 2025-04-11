@@ -26,15 +26,27 @@
       <button id="saveUpiBtn">Save Settings</button>
     </div>
 
-    <!-- Transaction List -->
-    <div id="txnList" class="transaction-list"></div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"><span class="tick">✔</span> Approved successfully!</div>
+
+    <!-- Transactions Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>UTR</th>
+          <th>Amount</th>
+          <th>App</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="transactionBody"></tbody>
+    </table>
 
     <!-- Chart -->
     <canvas id="statusChart" width="400" height="200"></canvas>
   </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="toast"><span class="tick">✔</span> Approved successfully!</div>
 
   <script type="module" src="admin.js"></script>
 </body>
