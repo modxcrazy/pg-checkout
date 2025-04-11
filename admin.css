@@ -1,32 +1,27 @@
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #121212;
+  background-color: #1e1e1e;
   color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 20px;
 }
 
 .admin-panel {
-  max-width: 1100px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #1e1e1e;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  max-width: 1000px;
+  margin: auto;
 }
 
-h2, h3 {
-  color: #f5f5f5;
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .card {
   background: #2a2a2a;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-}
-
-.form-group {
-  margin-bottom: 15px;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 label {
@@ -35,94 +30,56 @@ label {
   color: #ccc;
 }
 
-input {
+input[type="text"], input[type="number"] {
   width: 100%;
   padding: 10px;
-  border: 1px solid #444;
-  border-radius: 5px;
-  background: #222;
-  color: #fff;
-}
-
-button {
-  background: #00c853;
+  margin-bottom: 15px;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
+  border-radius: 5px;
+  background: #333;
   color: white;
-  transition: background 0.3s;
-}
-
-button:hover {
-  background: #00e676;
 }
 
 #saveUpiBtn {
-  width: 100%;
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-.transaction-list {
-  margin-top: 20px;
-}
-
-.txn-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1e1e1e;
-  border-bottom: 1px solid #333;
-  padding: 10px 15px;
-  font-size: 15px;
-}
-
-.txn-row span {
-  flex: 1;
-  text-align: center;
-  border-right: 1px solid #333;
-  padding: 6px;
-}
-
-.txn-row span:last-child {
+  background: linear-gradient(135deg, #00ff99, #00ccff);
+  color: #000;
+  padding: 12px 20px;
   border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.txn-buttons {
-  display: flex;
-  gap: 10px;
+#saveUpiBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0,255,180,0.6);
 }
 
-.txn-buttons button {
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
+#logoutBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 18px;
+  background-color: #ff4d4d;
   color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-.txn-buttons .approve-btn {
-  background-color: #00c853;
-}
-
-.txn-buttons .reject-btn {
-  background-color: #d32f2f;
+#logoutBtn:hover {
+  background-color: #ff1a1a;
 }
 
 .toast {
+  background: #333;
+  color: #0f0;
+  padding: 12px 16px;
+  border-radius: 5px;
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #323232;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 1000;
-}
-
-.toast.show {
-  opacity: 1;
+  display: none;
 }
