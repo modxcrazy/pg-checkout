@@ -1,31 +1,29 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f2f4f8;
   margin: 0;
-  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f4f4;
+  color: #333;
 }
 
 .admin-panel {
-  max-width: 700px;
-  margin: auto;
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
-h2 {
+h2, h3 {
   text-align: center;
-  color: #2d2d2d;
 }
 
 .card {
-  background: #fff;
-  border-radius: 10px;
+  background: #fafafa;
   padding: 20px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.card h3 {
-  margin-top: 0;
-  color: #333;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
 }
 
 .form-group {
@@ -34,8 +32,8 @@ h2 {
 
 label {
   display: block;
+  font-weight: 600;
   margin-bottom: 5px;
-  color: #444;
 }
 
 input[type="text"],
@@ -43,125 +41,85 @@ input[type="number"],
 input[type="date"] {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
   font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-button {
-  padding: 10px 18px;
+#saveUpiBtn {
+  padding: 12px 20px;
+  font-size: 16px;
   background: #007bff;
+  color: white;
   border: none;
   border-radius: 6px;
-  color: white;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: 0.3s;
 }
 
-button:hover {
+#saveUpiBtn:hover {
   background: #0056b3;
 }
 
-/* Transaction List */
 .transaction-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
-.transaction-item {
-  background: #fff;
-  padding: 15px 20px;
-  border-radius: 8px;
+.transaction-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.transaction-item:hover {
-  transform: scale(1.01);
-}
-
-.transaction-date {
-  font-weight: bold;
-  color: #333;
-}
-
-.transaction-actions button {
-  margin-left: 10px;
-  padding: 6px 14px;
-  font-size: 14px;
-  border-radius: 5px;
-}
-
-.transaction-actions .view-btn {
-  background: #28a745;
-}
-
-.transaction-actions .approve-btn {
-  background: #ffc107;
-  color: #222;
-}
-
-/* Dialog Box */
-.dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  width: 90%;
-  max-width: 400px;
-  display: none;
-}
-
-.dialog p {
-  font-size: 16px;
-  margin: 8px 0;
-  color: #000;
-}
-
-.close-btn {
-  background: #dc3545;
-  color: #fff;
-  float: right;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.05);
   margin-bottom: 10px;
-  padding: 5px 12px;
-  border-radius: 5px;
   font-size: 14px;
-  cursor: pointer;
-  border: none;
+  overflow-x: auto;
 }
 
-/* Toast Popup */
+.transaction-row > div {
+  padding: 0 10px;
+  white-space: nowrap;
+  border-right: 1px solid #ccc;
+}
+
+.transaction-row > div:last-child {
+  border-right: none;
+}
+
+.txn-btns {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.txn-btns button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approve-btn {
+  background: #28a745;
+  color: white;
+}
+
+.reject-btn {
+  background: #dc3545;
+  color: white;
+}
+
 .toast {
   position: fixed;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 20px;
   background: #28a745;
   color: white;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-size: 16px;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+  padding: 12px 18px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  display: none;
   z-index: 999;
-}
-
-.toast.show {
-  opacity: 1;
-}
-
-.tick {
-  margin-right: 8px;
-  font-weight: bold;
 }
