@@ -23,7 +23,7 @@ let dynamicAmount = "";
 
 // Load UPI ID & amount from Firebase
 async function loadUPIData() {
-  const snapshot = await get(child(ref(db), "paymentSettings"));
+  const snapshot = await get(child(ref(db), "settings"));
   if (snapshot.exists()) {
     dynamicUpi = snapshot.val().upiId;
     dynamicAmount = snapshot.val().amount;
