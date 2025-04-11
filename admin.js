@@ -1,5 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
@@ -10,6 +12,21 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+// At the top of admin.js
+const auth = getAuth();
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "login.html"; // Redirect if not logged in
+  }
+});
+
+// -------- LogOut Button --------
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+});
 
 // -------- Save UPI Settings --------
 document.getElementById("saveUpiBtn").addEventListener("click", () => {
