@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
@@ -11,101 +11,76 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let chartInstance;
+// -------- Save UPI Settings --------
+document.getElementById("saveUpiBtn").addEventListener("click", () => {
+  const upi = document.getElementById("adminUpi").value.trim();
+  const amount = document.getElementById("adminAmount").value.trim();
 
-function loadTransactions() {
-  get(ref(db, "transactions")).then(snapshot => {
-    const data = snapshot.val();
-    const container = document.getElementById("txnList");
-    container.innerHTML = "";
+  if (!upi || !amount) return alert("Please enter UPI ID and Amount");
 
-    let approved = 0, pending = 0;
-    const filter = document.getElementById("filterDate").value;
-
-    for (const key in data) {
-  const txn = data[key];
-  const matchDate = !filter || txn.date === filter;
-
-  if (matchDate) {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <span>${txn.utr}</span>
-      <span>${txn.amount}</span>
-      <button onclick='approveTransaction("${key}")'>Approve</button>
-      <button onclick='showDialog(${JSON.stringify(txn)})'>View</button>
-    `;
-    container.appendChild(div);
-  }
-
-  if (txn.status === "approved") approved++;
-  if (txn.status === "pending") pending++;
-}
-
-    showChart(approved, pending);
-
-    document.querySelectorAll("button[data-id]").forEach(btn => {
-      btn.onclick = () => {
-        const id = btn.getAttribute("data-id");
-        update(ref(db, "transactions/" + id), { status: "approved" });
-        showToast("Approved successfully!");
-        loadTransactions();
-      };
-    });
+  set(ref(db, "settings"), {
+    upi: upi,
+    amount: amount
+  }).then(() => {
+    alert("UPI Settings Updated");
   });
-}
+});
 
-function showChart(approved, pending) {
-  const ctx = document.getElementById("txnChart").getContext("2d");
-  if (chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Approved", "Pending"],
-      datasets: [{
-        label: "Transactions",
-        data: [approved, pending],
-        backgroundColor: ["green", "orange"]
-      }]
+// -------- Load Transactions --------
+function loadTransactions() {
+  const txnList = document.getElementById("txnList");
+  txnList.innerHTML = "";
+
+  get(ref(db, "transactions")).then(snapshot => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const keys = Object.keys(data).reverse();
+
+      keys.forEach(id => {
+        const txn = data[id];
+
+        const row = document.createElement("div");
+        row.className = "transaction-row";
+
+        row.innerHTML = `
+          <div>${txn.utr}</div>
+          <div>₹${txn.amount}</div>
+          <div>${txn.app}</div>
+          <div>${txn.status}</div>
+          <div>${txn.date}</div>
+          <div class="txn-btns">
+            <button class="reject-btn" onclick="updateStatus('${id}', 'rejected')">Reject</button>
+            <button class="approve-btn" onclick="updateStatus('${id}', 'approved')">Approve</button>
+          </div>
+        `;
+
+        txnList.appendChild(row);
+      });
     }
   });
 }
 
+// -------- Update Status --------
+window.updateStatus = (id, status) => {
+  update(ref(db, "transactions/" + id), {
+    status: status
+  }).then(() => {
+    if (status === "approved") {
+      showToast("Approved successfully!");
+    } else {
+      alert("Transaction Rejected");
+    }
+    loadTransactions();
+  });
+};
+
+// -------- Show Toast --------
 function showToast(msg) {
   const toast = document.getElementById("toast");
-  toast.innerHTML = `<span class="tick">✔</span> ${msg}`;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 3000);
+  toast.textContent = msg;
+  toast.style.display = "block";
+  setTimeout(() => (toast.style.display = "none"), 3000);
 }
 
-document.getElementById("filterDate").addEventListener("change", loadTransactions);
+// -------- Initial Load --------
 loadTransactions();
-
-// Function to approve a transaction
-function approveTransaction(txnId) {
-  const txnRef = ref(db, "transactions/" + txnId);
-  set(txnRef, {
-    ...data[txnId],
-    status: "approved"  // Mark as approved
-  }).then(() => {
-    alert("Transaction approved successfully!");
-    location.reload(); // Refresh the page to reflect the updated status
-  }).catch(error => {
-    alert("Error: " + error.message);
-  });
-}
-
-// Function to show transaction details in a dialog
-function showDialog(txn) {
-  document.getElementById("dUtr").textContent = txn.utr;
-  document.getElementById("dAmount").textContent = txn.amount;
-  document.getElementById("dApp").textContent = txn.app || 'N/A';
-  document.getElementById("dStatus").textContent = txn.status;
-  document.getElementById("dDate").textContent = txn.date;
-  document.getElementById("txnDialog").style.display = "block";
-}
-
-// Function to close the dialog
-function closeDialog() {
-  document.getElementById("txnDialog").style.display = "none";
-}
