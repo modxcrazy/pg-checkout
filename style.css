@@ -110,3 +110,23 @@ input[type="text"] {
   border-radius: 8px;
   font-weight: bold;
 }
+
+.qr-loader {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #f6f7f8;
+  background-image: linear-gradient(90deg, #f6f7f8 0px, #edeef1 40px, #f6f7f8 80px);
+  background-size: 600px;
+  animation: shimmer 1.6s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
