@@ -30,13 +30,46 @@
 }
 
 .upi-apps {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
   margin: 20px 0;
-  text-align: left;
+  flex-wrap: wrap;
 }
 
-.upi-apps label {
-  display: block;
-  margin: 6px 0;
+.upi-option {
+  background: #ffffff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.upi-option:hover {
+  border-color: #4caf50;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+}
+
+.upi-option input[type="radio"] {
+  display: none;
+}
+
+.upi-option img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.upi-option.selected {
+  border-color: #4caf50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+  font-weight: bold;
+  color: #4caf50;
 }
 
 input[type="text"] {
