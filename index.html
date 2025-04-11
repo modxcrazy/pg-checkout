@@ -3,101 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <title>UPI Payment</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      background: #f8f9fa;
+      text-align: center;
+    }
+    .upi-options {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .upi-radio {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .upi-radio:hover {
+      border-color: #2196f3;
+    }
+    .upi-radio input[type="radio"] {
+      display: none;
+    }
+    .upi-radio .icon {
+      width: 30px;
+      height: 30px;
+      background-size: cover;
+      border-radius: 5px;
+    }
+    .icon.phonepe {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f0/PhonePe_Logo.svg');
+      background-color: #5f259f;
+    }
+    .icon.gpay {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/5b/Google_Pay_Logo.svg');
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+    .icon.paytm {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png');
+      background-color: #00b9f1;
+    }
+    .upi-radio input[type="radio"]:checked + .icon + span {
+      font-weight: bold;
+      color: #2196f3;
+    }
+    #payBtn {
+      padding: 12px 30px;
+      font-size: 18px;
+      background-color: #2196f3;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Select UPI App</h2>
-    <div class="upi-option">
-      <div class="upi-options">
-  <label class="upi-radio">
-    <input type="radio" name="upiApp" value="phonepe" />
-    <span class="icon phonepe"></span>
-    <span>PhonePe</span>
-  </label>
 
-  <label class="upi-radio">
-    <input type="radio" name="upiApp" value="gpay" />
-    <span class="icon gpay"></span>
-    <span>Google Pay</span>
-  </label>
+  <h2>Select UPI App</h2>
 
-  <label class="upi-radio">
-    <input type="radio" name="upiApp" value="paytm" />
-    <span class="icon paytm"></span>
-    <span>Paytm</span>
-  </label>
-</div>
-    </div>
-
-    <div class="qr-section">
-      <h3>Scan to Pay</h3>
-      <img id="qrImage" src="" alt="QR Code" width="200">
-      <p><strong>UPI ID:</strong> <span id="upi-id">Loading...</span></p>
-      <p id="timer">Time Left: 15:00</p>
-    </div>
-
-    <button id="payBtn">Pay Now</button>
-    <button id="confirmPayment">I Have Paid</button>
-
-    <p id="status" style="margin-top: 20px;"></p>
+  <div class="upi-options">
+    <label class="upi-radio">
+      <input type="radio" name="upiApp" value="phonepe">
+      <span class="icon phonepe"></span>
+      <span>PhonePe</span>
+    </label>
+    <label class="upi-radio">
+      <input type="radio" name="upiApp" value="gpay">
+      <span class="icon gpay"></span>
+      <span>Google Pay</span>
+    </label>
+    <label class="upi-radio">
+      <input type="radio" name="upiApp" value="paytm">
+      <span class="icon paytm"></span>
+      <span>Paytm</span>
+    </label>
   </div>
 
-  <script type="module" src="firebase-config.js"></script>
-  <script src="utils.js"></script>
-  <script>
-    let selectedUpi = "phonepe@upi";
-    const qrImage = document.getElementById("qrImage");
-    const upiSpan = document.getElementById("upi-id");
-    const statusText = document.getElementById("status");
-    const confirmBtn = document.getElementById("confirmPayment");
-    const timerEl = document.getElementById("timer");
+  <button id="payBtn">Pay Now</button>
+  <p id="status">Waiting for action...</p>
 
-    // Generate QR
-    function updateQR(upiId) {
-      const amount = 10;
-      const upiUri = `upi://pay?pa=${upiId}&pn=Brijesh&cu=INR&am=${amount}`;
-      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiUri)}&size=200x200`;
-      upiSpan.innerText = upiId;
-      selectedUpi = upiId;
+  <!-- Firebase & Utility -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
+      authDomain: "pg-data-ed1c2.firebaseapp.com",
+      databaseURL: "https://pg-data-ed1c2-default-rtdb.firebaseio.com",
+      projectId: "pg-data-ed1c2",
+      storageBucket: "pg-data-ed1c2.appspot.com",
+      messagingSenderId: "884858492190",
+      appId: "1:884858492190:web:67b7606ff790064ef3250f",
+      measurementId: "G-J73RD8EH7W"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function fetchUPI(appName) {
+      const snapshot = await get(ref(db, 'upi_ids/' + appName));
+      return snapshot.exists() ? snapshot.val() : null;
     }
 
-    // UPI radio change
-    document.querySelectorAll('input[name="upiApp"]').forEach((el) => {
-      el.addEventListener("change", () => updateQR(el.value));
-    });
+    function saveTransaction(data) {
+      set(ref(db, `transactions/${data.id}`), data);
+    }
 
-    // Initial QR
-    updateQR(selectedUpi);
+    function simulateVerify(txnId) {
+      setTimeout(async () => {
+        const txnRef = ref(db, `transactions/${txnId}`);
+        const snapshot = await get(txnRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          data.status = "success";
+          set(txnRef, data);
+          showSuccessAnimation();
+          playSuccessSound();
+          triggerVibration();
+          document.getElementById("status").innerText = "Payment Successful!";
+        }
+      }, 4000);
+    }
 
-    // Countdown timer
-    let time = 15 * 60;
-    const timer = setInterval(() => {
-      const min = String(Math.floor(time / 60)).padStart(2, "0");
-      const sec = String(time % 60).padStart(2, "0");
-      timerEl.innerText = `Time Left: ${min}:${sec}`;
-      if (time <= 0) {
-        clearInterval(timer);
-        statusText.innerText = "Time expired. Please try again.";
-        confirmBtn.disabled = true;
-      }
-      time--;
-    }, 1000);
+    function showSuccessAnimation() {
+      const msg = document.createElement("div");
+      msg.innerText = "✓ Payment Successful";
+      msg.style.position = "fixed";
+      msg.style.top = "50%";
+      msg.style.left = "50%";
+      msg.style.transform = "translate(-50%, -50%)";
+      msg.style.padding = "20px 40px";
+      msg.style.background = "#00e676";
+      msg.style.color = "#000";
+      msg.style.fontSize = "24px";
+      msg.style.fontWeight = "bold";
+      msg.style.borderRadius = "10px";
+      msg.style.boxShadow = "0 0 30px #00e676";
+      msg.style.zIndex = "9999";
+      document.body.appendChild(msg);
+      setTimeout(() => msg.remove(), 3000);
+    }
 
-    // Payment confirm
-    confirmBtn.addEventListener("click", () => {
-      const txnId = `TXN_${Date.now()}`;
-      const data = {
+    function playSuccessSound() {
+      const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-4.mp3");
+      audio.play();
+    }
+
+    function triggerVibration() {
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+
+    document.getElementById("payBtn").addEventListener("click", async () => {
+      const selectedApp = document.querySelector('input[name="upiApp"]:checked')?.value;
+      if (!selectedApp) return alert("Select a UPI App first!");
+
+      const upiId = await fetchUPI(selectedApp);
+      if (!upiId) return alert("UPI ID not found!");
+
+      const amount = 100;
+      const txnId = "TXN" + Date.now();
+
+      saveTransaction({
         id: txnId,
-        upi: selectedUpi,
-        amount: 10,
+        upi: upiId,
+        amount,
         status: "pending",
         createdAt: new Date().toISOString()
-      };
-      saveTransaction(data);
-      statusText.innerText = "Checking payment status...";
+      });
+
+      document.getElementById("status").innerText = "Checking payment status…";
       simulateVerify(txnId);
+
+      const upiUrl = `upi://pay?pa=${upiId}&pn=Receiver&am=${amount}&tn=Payment&cu=INR`;
+      window.location.href = upiUrl;
     });
   </script>
+
 </body>
 </html>
