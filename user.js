@@ -1,119 +1,97 @@
+// Firebase config
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push
+} from "https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
-
+// Your Firebase config (replace with yours)
 const firebaseConfig = {
-  apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
-  authDomain: "pg-data-ed1c2.firebaseapp.com",
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
   databaseURL: "https://pg-data-ed1c2-default-rtdb.firebaseio.com",
-  projectId: "pg-data-ed1c2"
+  projectId: "pg-data-ed1c2",
+  storageBucket: "pg-data-ed1c2.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let selectedApp = "";
-let timeLeft = 15 * 60;
-let timerInterval = null;
+// Elements
+const qrImage = document.getElementById("qrImage");
+const qrLoader = document.getElementById("qrLoader");
+const upiDisplay = document.getElementById("upiDisplay");
+const amtDisplay = document.getElementById("amtDisplay");
+const timer = document.getElementById("timer");
+const payBtn = document.getElementById("payBtn");
+const utrInput = document.getElementById("utr");
+const successAnimation = document.getElementById("successAnimation");
 
-// -------------------- Load UPI ID + Amount --------------------
-get(ref(db, "settings")).then(snapshot => {
-  if (snapshot.exists()) {
-    const { upi, amount } = snapshot.val();
+// 1. Load UPI details from Firebase
+let upiId = "";
+let amount = 0;
 
-    document.getElementById("upiDisplay").textContent = upi;
-    document.getElementById("amtDisplay").textContent = "₹" + amount;
+onValue(ref(db, "settings"), (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    upiId = data.upi;
+    amount = data.amount;
+    upiDisplay.textContent = upiId;
+    amtDisplay.textContent = `₹${amount}`;
 
-    generateQR(upi, amount);
-    startTimer();
+    // Generate QR
+    const qrData = `upi://pay?pa=${upiId}&pn=User&am=${amount}&cu=INR`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200`;
+
+    qrImage.src = qrUrl;
+    qrImage.onload = () => {
+      qrLoader.style.display = "none";
+      qrImage.style.display = "block";
+    };
   }
 });
 
-// -------------------- Generate UPI QR --------------------
-function generateQR(upi, amount) {
-  const qrURL = `upi://pay?pa=${upi}&pn=In99Soft&am=${amount}&cu=INR`;
-  const encodedURL = encodeURIComponent(qrURL);
-  const qrImgURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedURL}`;
+// 2. Countdown Timer (15 mins)
+let timeLeft = 15 * 60;
+const updateTimer = () => {
+  const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const sec = String(timeLeft % 60).padStart(2, '0');
+  timer.textContent = `${min}:${sec}`;
+  if (timeLeft > 0) timeLeft--;
+};
+setInterval(updateTimer, 1000);
 
-  const qrImage = document.getElementById("qrImage");
-  const qrLoader = document.getElementById("qrLoader");
-  qrLoader.style.display = "block";
-  qrImage.style.display = "none";
+// 3. On Click - Submit UTR
+payBtn.addEventListener("click", () => {
+  const utr = utrInput.value.trim();
+  const selectedApp = document.querySelector('input[name="upiApp"]:checked')?.value;
 
-  const img = new Image();
-  img.onload = () => {
-    qrImage.src = qrImgURL;
-    qrLoader.style.display = "none";
-    qrImage.style.display = "block";
-  };
-  img.src = qrImgURL;
-}
+  if (!utr || !selectedApp) {
+    alert("Please enter UTR and select a UPI App.");
+    return;
+  }
 
-// -------------------- Start Countdown --------------------
-function startTimer() {
-  timerInterval = setInterval(() => {
-    const mins = Math.floor(timeLeft / 60);
-    const secs = timeLeft % 60;
-    document.getElementById("timer").textContent = \`\${mins}:\${secs < 10 ? '0' : ''}\${secs}\`;
-    timeLeft--;
-
-    if (timeLeft < 0) {
-      clearInterval(timerInterval);
-      document.getElementById("timer").textContent = "Expired";
-    }
-  }, 1000);
-}
-
-// -------------------- UPI App Selection with Glow --------------------
-document.querySelectorAll(".upi-option").forEach(option => {
-  option.addEventListener("click", () => {
-    document.querySelectorAll(".upi-option").forEach(opt => opt.classList.remove("selected"));
-    option.classList.add("selected");
-    option.querySelector("input[type='radio']").checked = true;
-    selectedApp = option.querySelector("input[type='radio']").value;
-  });
-});
-
-// -------------------- Handle Payment --------------------
-document.getElementById("payBtn").addEventListener("click", () => {
-  const utr = document.getElementById("utr").value.trim();
-  if (!selectedApp) return alert("Please select a UPI App!");
-  if (!utr || utr.length < 6) return alert("Enter a valid UTR number!");
-
-  const amount = document.getElementById("amtDisplay").textContent.replace("₹", "");
-  const upi = document.getElementById("upiDisplay").textContent;
-  const date = new Date().toISOString().split("T")[0];
-  const txnId = Date.now();
-
-  set(ref(db, "transactions/" + txnId), {
-    utr: utr,
-    status: "pending",
-    amount: amount,
-    upi: upi,
+  const txn = {
+    utr,
     app: selectedApp,
-    date: date
-  }).then(() => {
-    showSuccessAnimation();
-    document.getElementById("utr").value = "";
-    document.querySelectorAll(".upi-option").forEach(opt => opt.classList.remove("selected"));
-    document.querySelectorAll("input[name='upiApp']").forEach(r => r.checked = false);
-    selectedApp = "";
-  });
+    amount,
+    upi: upiId,
+    status: "Pending",
+    date: new Date().toLocaleString()
+  };
+
+  push(ref(db, "transactions"), txn)
+    .then(() => {
+      successAnimation.style.display = "block";
+      setTimeout(() => location.reload(), 3000);
+    })
+    .catch((err) => {
+      alert("Error saving transaction.");
+      console.error(err);
+    });
 });
-
-// -------------------- Success Animation --------------------
-function showSuccessAnimation() {
-  const successBox = document.getElementById("successAnimation");
-  successBox.style.display = "block";
-  playSuccessSound();
-  setTimeout(() => {
-    successBox.style.display = "none";
-    location.reload(); // auto refresh
-  }, 4000);
-}
-
-// -------------------- Success Sound --------------------
-function playSuccessSound() {
-  const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
-  audio.play().catch(err => console.warn("Audio playback failed:", err));
-}
