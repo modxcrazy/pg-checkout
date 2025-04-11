@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="admin-panel">
+    <h2>Admin Dashboard</h2>
+    <input type="date" id="filterDate">
+    <div id="txnList" class="transaction-list"></div>
+    <canvas id="txnChart" height="100"></canvas>
+  </div>
+
+  <div id="toast" class="toast">Approved successfully!</div>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
