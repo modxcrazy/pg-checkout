@@ -24,25 +24,28 @@ function loadTransactions() {
     const filter = document.getElementById("filterDate").value;
 
     for (const key in data) {
-      const txn = data[key];
-      const matchDate = !filter || txn.date === filter;
+  const txn = data[key];
+  const matchDate = !filter || txn.date === filter;
 
-      if (matchDate) {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-          <p><b>Amount:</b> ₹${txn.amount}</p>
-          <p><b>UTR:</b> ${txn.utr}</p>
-          <p><b>Status:</b> ${txn.status}</p>
-          <p><b>Date:</b> ${txn.date}</p>
-          <button data-id="${key}">Approve</button>
-        `;
-        container.appendChild(div);
-      }
+  if (matchDate) {
+    const div = document.createElement("div");
+    div.className = "card";
 
-      if (txn.status === "approved") approved++;
-      if (txn.status === "pending") pending++;
-    }
+    div.innerHTML = `
+      <p><strong>UTR:</strong> ${txn.utr}</p>
+      <p><strong>Status:</strong> ${txn.status === "approved" ? "<span style='color:green;'>Approved</span>" : "<span style='color:orange;'>Pending</span>"}</p>
+      <p><strong>Amount:</strong> ₹${txn.amount}</p>
+      <p><strong>App:</strong> ${txn.app}</p>
+      <p><strong>Date:</strong> ${txn.date}</p>
+      ${txn.status !== "approved" ? `<button data-id="${key}">Approve</button>` : ""}
+    `;
+
+    container.appendChild(div);
+  }
+
+  if (txn.status === "approved") approved++;
+  if (txn.status === "pending") pending++;
+}
 
     showChart(approved, pending);
 
