@@ -16,13 +16,18 @@
       <p class="bottom-text">QR Code will be expire in: <span id="timer">15:00</span></p>
     </div>
 
-    <div class="upi-apps">
-      <label><input type="radio" name="upiApp" value="phonepe" checked> PhonePe</label>
-      <label><input type="radio" name="upiApp" value="gpay"> Google Pay</label>
-      <label><input type="radio" name="upiApp" value="paytm"> Paytm</label>
+    <div class="upi-details">
+      <p><strong>UPI ID:</strong> <span id="upiDisplay">Loading...</span></p>
+      <p><strong>Amount:</strong> <span id="amtDisplay">₹0</span></p>
     </div>
 
-    <input type="text" id="utrNumber" placeholder="Enter UTR Number" />
+    <div class="upi-apps">
+      <label><input type="radio" name="upiApp" value="PhonePe"> PhonePe</label>
+      <label><input type="radio" name="upiApp" value="GPay"> Google Pay</label>
+      <label><input type="radio" name="upiApp" value="Paytm"> Paytm</label>
+    </div>
+
+    <input type="text" id="utr" placeholder="Enter UTR Number" />
     <button id="payBtn" class="glow-btn">I Have Paid</button>
 
     <div id="successAnimation" class="success-animation">Payment Verified!</div>
