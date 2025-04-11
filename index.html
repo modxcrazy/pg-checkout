@@ -45,15 +45,28 @@
       padding: 20px;
       margin-bottom: 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
     }
 
-    .qr-img {
+    .qr-img,
+    .qr-loader {
       width: 200px;
       height: 200px;
       object-fit: contain;
       border-radius: 12px;
       margin: 15px 0;
       border: 2px solid #fff;
+    }
+
+    .qr-loader {
+      background: linear-gradient(90deg, #eeeeee 25%, #dddddd 50%, #eeeeee 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    .qr-img {
+      display: none;
+      animation: zoomIn 0.5s ease-in-out forwards;
     }
 
     .top-text, .bottom-text {
@@ -134,13 +147,23 @@
       animation: pop 0.6s ease forwards;
     }
 
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; display: block; }
+    }
+
     @keyframes pop {
       0% { transform: scale(0.7); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
 
     @media(max-width: 500px) {
-      .qr-img {
+      .qr-img, .qr-loader {
         width: 160px;
         height: 160px;
       }
@@ -157,13 +180,14 @@
 
     <div class="qr-card">
       <p class="top-text">Scan any UPI App</p>
-      <img id="qrImage" src="" alt="UPI QR" class="qr-img" />
+      <div id="qrLoader" class="qr-loader"></div>
+      <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=abc@upi&pn=Name&am=99&cu=INR" alt="UPI QR" class="qr-img" />
       <p class="bottom-text">QR Code will be expire in: <span id="timer">15:00</span></p>
     </div>
 
     <div class="upi-details">
-      <p><strong>UPI ID:</strong> <span id="upiDisplay">Loading...</span></p>
-      <p><strong>Amount:</strong> <span id="amtDisplay">₹0</span></p>
+      <p><strong>UPI ID:</strong> <span id="upiDisplay">abc@upi</span></p>
+      <p><strong>Amount:</strong> <span id="amtDisplay">₹99</span></p>
     </div>
 
     <div class="upi-apps">
@@ -190,6 +214,14 @@
     <div id="successAnimation" class="success-animation">Payment Verified!</div>
   </div>
 
-  <script type="module" src="user.js"></script>
+  <script>
+    const qrImage = document.getElementById("qrImage");
+    const qrLoader = document.getElementById("qrLoader");
+
+    qrImage.addEventListener("load", () => {
+      qrLoader.style.display = "none";
+      qrImage.style.display = "block";
+    });
+  </script>
 </body>
 </html>
