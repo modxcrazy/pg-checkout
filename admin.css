@@ -74,12 +74,21 @@ input[type="text"], input[type="number"] {
 }
 
 .toast {
-  background: #333;
-  color: #0f0;
-  padding: 12px 16px;
-  border-radius: 5px;
+  background: #282c34;
+  color: #00ff88;
+  padding: 14px 20px;
+  border-radius: 8px;
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: none;
+  bottom: 30px;
+  right: 30px;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
