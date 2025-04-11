@@ -21,11 +21,31 @@
       <p><strong>Amount:</strong> <span id="amtDisplay">₹0</span></p>
     </div>
 
+    <!---
     <div class="upi-apps">
       <label><input type="radio" name="upiApp" value="PhonePe"> PhonePe</label>
       <label><input type="radio" name="upiApp" value="GPay"> Google Pay</label>
       <label><input type="radio" name="upiApp" value="Paytm"> Paytm</label>
     </div>
+    --->
+
+    <div class="upi-apps">
+  <label class="upi-option">
+    <input type="radio" name="upiApp" value="PhonePe" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/PhonePe_Logo.png" alt="PhonePe" />
+    PhonePe
+  </label>
+  <label class="upi-option">
+    <input type="radio" name="upiApp" value="GPay" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Google_Pay_Logo.svg" alt="GPay" />
+    Google Pay
+  </label>
+  <label class="upi-option">
+    <input type="radio" name="upiApp" value="Paytm" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png" alt="Paytm" />
+    Paytm
+  </label>
+</div>
 
     <input type="text" id="utr" placeholder="Enter UTR Number" />
     <button id="payBtn" class="glow-btn">I Have Paid</button>
