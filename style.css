@@ -26,16 +26,61 @@ h2, h3 {
   color: #00ffd5;
 }
 
-.upi-option {
+.upi-options {
   display: flex;
-  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
   margin-bottom: 20px;
 }
 
-.upi-option label {
-  margin: 8px 0;
-  font-size: 16px;
-  color: #ccc;
+.upi-radio {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.upi-radio:hover {
+  border-color: #2196f3;
+}
+
+.upi-radio input[type="radio"] {
+  display: none;
+}
+
+.upi-radio .icon {
+  width: 30px;
+  height: 30px;
+  background-size: cover;
+  border-radius: 5px;
+}
+
+.icon.phonepe {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f0/PhonePe_Logo.svg');
+  background-color: #5f259f;
+}
+
+.icon.gpay {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/5b/Google_Pay_Logo.svg');
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.icon.paytm {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png');
+  background-color: #00b9f1;
+}
+
+.upi-radio input[type="radio"]:checked + .icon + span {
+  font-weight: bold;
+  color: #2196f3;
 }
 
 .qr-section {
