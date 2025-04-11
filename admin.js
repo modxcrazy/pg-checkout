@@ -68,7 +68,7 @@ document.getElementById("saveUpiBtn").addEventListener("click", () => {
   }
 
   set(ref(db, "settings"), {
-    upiId: upiId,
+    upi: upiId,
     amount: amount
   }).then(() => {
     showToast("UPI & Amount Updated!");
