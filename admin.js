@@ -13,11 +13,11 @@ const firebaseConfig = {
 // Init
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth();
+const auth = getAuth(app);
 
 // Auth Guard
 onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = "login.html";
+  if (!user) window.location.href = "admin-login.html";
 });
 
 // Logout
