@@ -17,7 +17,7 @@ document.getElementById("loginBtn").addEventListener("click", () => {
 
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
-      window.location.href = "admin.html";
+      window.location.href = "dashboard.html";
     })
     .catch(err => {
       document.getElementById("loginError").textContent = "Invalid credentials!";
