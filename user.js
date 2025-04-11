@@ -12,7 +12,8 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let selectedApp = "";
-let timer;
+let timeLeft = 15 * 60;
+let timerInterval = null;
 
 // -------------------- Load UPI ID + Amount --------------------
 get(ref(db, "settings")).then(snapshot => {
@@ -36,21 +37,22 @@ document.querySelectorAll("input[name='upiApp']").forEach(input => {
 
 // -------------------- Generate UPI QR --------------------
 function generateQR(upi, amount) {
-  const qrURL = `upi://pay?pa=${upi}&am=${amount}&cu=INR`;
-  document.getElementById("qrImage").src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrURL)}`;
+  const qrURL = `upi://pay?pa=${upi}&pn=In99Soft&am=${amount}&cu=INR`;
+  const encodedURL = encodeURIComponent(qrURL);
+  const qrImgURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedURL}`;
+  document.getElementById("qrImage").src = qrImgURL;
 }
 
 // -------------------- Start Countdown --------------------
 function startTimer() {
-  let timeLeft = 15 * 60; // 15 minutes in seconds
-  timer = setInterval(() => {
+  timerInterval = setInterval(() => {
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
     document.getElementById("timer").textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     timeLeft--;
 
     if (timeLeft < 0) {
-      clearInterval(timer);
+      clearInterval(timerInterval);
       document.getElementById("timer").textContent = "Expired";
     }
   }, 1000);
@@ -72,8 +74,13 @@ document.getElementById("payBtn").addEventListener("click", () => {
     utr: utr,
     status: "pending",
     amount: amount,
+    upi: upi,
+    app: selectedApp,
     date: date
   }).then(() => {
     alert("Payment submitted! Please wait for approval.");
+    document.getElementById("utr").value = "";
+    document.querySelectorAll("input[name='upiApp']").forEach(r => r.checked = false);
+    selectedApp = "";
   });
 });
