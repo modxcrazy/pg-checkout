@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getDatabase, ref, push, get, child } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
@@ -16,13 +16,26 @@ const timerText = document.getElementById("timer");
 const payBtn = document.getElementById("payBtn");
 const successBox = document.getElementById("successAnimation");
 
-let qrRef = ref(db, "qr");
 let minutes = 15;
 let seconds = 0;
+let dynamicUpi = "";
+let dynamicAmount = "";
 
-function loadQR() {
-  fetch("https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=upi://pay?pa=demo@upi&am=99&cu=INR")
-    .then(res => qrImage.src = res.url);
+// Load UPI ID & amount from Firebase
+async function loadUPIData() {
+  const snapshot = await get(child(ref(db), "paymentSettings"));
+  if (snapshot.exists()) {
+    dynamicUpi = snapshot.val().upiId;
+    dynamicAmount = snapshot.val().amount;
+    loadQR(dynamicUpi, dynamicAmount);
+  } else {
+    alert("Failed to load UPI settings.");
+  }
+}
+
+function loadQR(upi, amount) {
+  const encoded = encodeURIComponent(`upi://pay?pa=${upi}&am=${amount}&cu=INR`);
+  qrImage.src = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encoded}`;
 }
 
 function startTimer() {
@@ -46,14 +59,14 @@ payBtn.addEventListener("click", () => {
   }
 
   const app = document.querySelector('input[name="upiApp"]:checked').value;
-  const amount = "99";
 
   const data = {
     utr: utr,
     status: "pending",
     date: new Date().toISOString().split("T")[0],
     app: app,
-    amount: amount
+    amount: dynamicAmount,
+    upiId: dynamicUpi
   };
 
   push(ref(db, "transactions"), data).then(() => {
@@ -62,5 +75,6 @@ payBtn.addEventListener("click", () => {
   });
 });
 
-loadQR();
+// INIT
+loadUPIData();
 startTimer();
