@@ -167,3 +167,61 @@ input {
   border-radius: 50%;
   font-weight: bold;
 }
+
+.card {
+  height: 40px;
+  padding: 0 15px;
+  background: #fff;
+  border-radius: 8px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.card span {
+  color: #000;
+  font-size: 14px;
+}
+
+.card button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-left: 5px;
+}
+
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 25px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  border-radius: 10px;
+  width: 300px;
+  display: none;
+}
+
+.dialog p {
+  margin: 8px 0;
+  color: #000;
+}
+
+.close-btn {
+  background: #ff5252;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  float: right;
+}
