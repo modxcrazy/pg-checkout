@@ -161,3 +161,22 @@ function playNotificationEffects() {
     setTimeout(() => bell.classList.remove("shake-bell"), 1000);
   }
 }
+
+/!----- Now Added History Delete---->
+const deleteBtn = document.createElement('button');
+deleteBtn.textContent = "Delete";
+deleteBtn.className = "btn-delete";
+deleteBtn.onclick = () => {
+  if (confirm("Are you sure you want to delete this transaction?")) {
+    const transactionRef = ref(db, `transactions/${transactionKey}`);
+    remove(transactionRef)
+      .then(() => {
+        showToast("Transaction deleted!", "red");
+      })
+      .catch((error) => {
+        console.error("Delete failed:", error);
+        showToast("Error deleting transaction!", "red");
+      });
+  }
+};
+row.appendChild(deleteBtn);
