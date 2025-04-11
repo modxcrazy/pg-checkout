@@ -28,13 +28,6 @@ get(ref(db, "settings")).then(snapshot => {
   }
 });
 
-// -------------------- UPI App Selection --------------------
-document.querySelectorAll("input[name='upiApp']").forEach(input => {
-  input.addEventListener("change", () => {
-    selectedApp = input.value;
-  });
-});
-
 // -------------------- Generate UPI QR --------------------
 function generateQR(upi, amount) {
   const qrURL = `upi://pay?pa=${upi}&pn=In99Soft&am=${amount}&cu=INR`;
@@ -58,6 +51,16 @@ function startTimer() {
   }, 1000);
 }
 
+// -------------------- UPI App Selection with Glow --------------------
+document.querySelectorAll(".upi-option").forEach(option => {
+  option.addEventListener("click", () => {
+    document.querySelectorAll(".upi-option").forEach(opt => opt.classList.remove("selected"));
+    option.classList.add("selected");
+    option.querySelector("input[type='radio']").checked = true;
+    selectedApp = option.querySelector("input[type='radio']").value;
+  });
+});
+
 // -------------------- Handle Payment --------------------
 document.getElementById("payBtn").addEventListener("click", () => {
   const utr = document.getElementById("utr").value.trim();
@@ -67,7 +70,6 @@ document.getElementById("payBtn").addEventListener("click", () => {
   const amount = document.getElementById("amtDisplay").textContent.replace("₹", "");
   const upi = document.getElementById("upiDisplay").textContent;
   const date = new Date().toISOString().split("T")[0];
-
   const txnId = Date.now();
 
   set(ref(db, "transactions/" + txnId), {
@@ -80,6 +82,7 @@ document.getElementById("payBtn").addEventListener("click", () => {
   }).then(() => {
     alert("Payment submitted! Please wait for approval.");
     document.getElementById("utr").value = "";
+    document.querySelectorAll(".upi-option").forEach(opt => opt.classList.remove("selected"));
     document.querySelectorAll("input[name='upiApp']").forEach(r => r.checked = false);
     selectedApp = "";
   });
