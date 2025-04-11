@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -18,24 +19,48 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(to right, #1c92d2, #f2fcfe);
-      background-size: cover;
-      overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1608571424300-b7137cdd7f2b?auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
+      position: relative;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      backdrop-filter: blur(8px);
+      background-color: rgba(0, 0, 0, 0.3);
+      z-index: 0;
     }
 
     .login-container {
+      position: relative;
+      z-index: 1;
       width: 100%;
       max-width: 400px;
       padding: 40px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 15px;
       backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      margin: 0 auto 20px;
+      animation: bounce 1.5s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     .login-container h2 {
-      text-align: center;
       color: #fff;
       font-weight: 600;
       margin-bottom: 30px;
@@ -51,11 +76,10 @@
       outline: none;
       color: #fff;
       font-size: 15px;
-      transition: background 0.3s ease;
     }
 
     .login-container input::placeholder {
-      color: #ddd;
+      color: #eee;
     }
 
     .login-container input:focus {
@@ -91,11 +115,15 @@
       .login-container {
         padding: 30px 20px;
       }
+      .logo {
+        width: 60px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="login-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/295/295128.png" alt="Logo" class="logo" />
     <h2>Admin Login</h2>
     <input type="email" id="loginEmail" placeholder="Enter Email" />
     <input type="password" id="loginPassword" placeholder="Enter Password" />
@@ -103,6 +131,46 @@
     <p id="loginError" class="error-text"></p>
   </div>
 
-  <script type="module" src="login.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const loginBtn = document.getElementById("loginBtn");
+    const loginError = document.getElementById("loginError");
+
+    loginBtn.addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          loginError.textContent = "";
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+          loginBtn.textContent = "Success!";
+          loginBtn.style.backgroundImage = "linear-gradient(to right, #00ff8c, #00b86b)";
+          setTimeout(() => {
+            window.location.href = "dashboard.html"; // Redirect to dashboard
+          }, 2000);
+        })
+        .catch((error) => {
+          loginError.textContent = "Invalid email or password!";
+          console.error(error);
+        });
+    });
+  </script>
 </body>
 </html>
