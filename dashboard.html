@@ -31,19 +31,18 @@
   <div id="toast" class="toast"><span class="tick">✔</span> Approved successfully!</div>
 
     <div class="transaction-row">
-  <div>UTR123456</div>
-  <div>₹200</div>
-  <div>PhonePe</div>
-  <div>pending</div>
-  <div>2025-04-11</div>
-  <div class="txn-btns">
+      <div>UTR123456</div>
+      <div>₹200</div>
+      <div>PhonePe</div>
+      <div>pending</div>
+      <div>2025-04-11</div>
+      <div class="txn-btns">
     <button class="reject-btn" onclick="updateStatus('txnId', 'rejected')">Reject</button>
     <button class="approve-btn" onclick="updateStatus('txnId', 'approved')">Approve</button>
   </div>
 </div>
     
     <!-- Transaction Filter + List -->
-    <input type="date" id="filterDate">
     <div id="txnList" class="transaction-list"></div>
     <canvas id="txnChart" height="100"></canvas>
   </div>
