@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
-import { signOut, getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
@@ -29,38 +29,56 @@ document.getElementById("saveUpiBtn").addEventListener("click", () => {
   set(ref(db, "settings"), { upi, amount }).then(() => showToast("Settings updated!"));
 });
 
-const transactions = [
-  { utr: "UTR001", amount: 1000, app: "GPay", date: "2025-04-11", status: "Pending" },
-  { utr: "UTR002", amount: 1500, app: "PhonePe", date: "2025-04-10", status: "Pending" }
-];
+// Live Transactions Array
+const transactions = [];
 
+// Firebase Live Listener for Transactions
+const transactionsRef = ref(db, "transactions");
+onValue(transactionsRef, snapshot => {
+  const data = snapshot.val();
+  if (!data) return;
+
+  transactions.length = 0; // Clear previous entries
+  Object.keys(data).forEach(key => {
+    transactions.push({ id: key, ...data[key] });
+  });
+
+  renderTransactions();
+  showToast("Transactions updated!");
+});
+
+// Render Transactions into Table
 function renderTransactions() {
   const tbody = document.getElementById("transactionBody");
   tbody.innerHTML = "";
-  transactions.forEach((txn, index) => {
+  transactions.forEach(txn => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${txn.utr}</td>
       <td>₹${txn.amount}</td>
-      <td>${txn.app}</td>
+      <td>${txn.app || 'N/A'}</td>
       <td>${txn.date}</td>
       <td>${txn.status}</td>
       <td>
-        <button class="approve-btn" onclick="updateStatus(${index}, 'Approved')">Approve</button>
-        <button class="reject-btn" onclick="updateStatus(${index}, 'Rejected')">Reject</button>
+        <button class="approve-btn" onclick="updateStatus('${txn.id}', 'Approved')">Approve</button>
+        <button class="reject-btn" onclick="updateStatus('${txn.id}', 'Rejected')">Reject</button>
       </td>
     `;
     tbody.appendChild(row);
   });
+
   updateChart();
 }
 
-window.updateStatus = (index, status) => {
-  transactions[index].status = status;
-  renderTransactions();
-  showToast(status === "Approved" ? "Approved successfully!" : "Transaction Rejected");
+// Update Status in Firebase
+window.updateStatus = (id, status) => {
+  update(ref(db, "transactions/" + id), { status })
+    .then(() => {
+      showToast(`${status} successfully!`);
+    });
 };
 
+// Update Chart
 function updateChart() {
   const counts = transactions.reduce((acc, t) => {
     acc[t.status] = (acc[t.status] || 0) + 1;
@@ -86,11 +104,10 @@ function updateChart() {
   });
 }
 
+// Show Toast
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.innerHTML = `<span class="tick">✔</span> ${msg}`;
   toast.style.display = "block";
   setTimeout(() => (toast.style.display = "none"), 3000);
 }
-
-document.addEventListener("DOMContentLoaded", renderTransactions);
