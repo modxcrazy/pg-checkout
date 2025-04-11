@@ -11,14 +11,14 @@
 
 .qr-card {
   background: #222;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 15px;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
 .qr-img {
-  width: 200px;
-  height: 200px;
+  width: 230px;
+  height: 230px;
   border-radius: 12px;
   animation: pulseZoom 3s infinite ease-in-out;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
