@@ -44,38 +44,39 @@ document.getElementById("saveUpiBtn").addEventListener("click", () => {
 });
 
 // -------- Load Transactions --------
-function loadTransactions() {
-  const txnList = document.getElementById("txnList");
-  txnList.innerHTML = "";
+const transactions = [
+  { utr: 'UTR001', amount: 1000, date: '2025-04-11', status: 'Pending' },
+  { utr: 'UTR002', amount: 1500, date: '2025-04-10', status: 'Pending' },
+  // Add more transactions as needed
+];
 
-  get(ref(db, "transactions")).then(snapshot => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      const keys = Object.keys(data).reverse();
-
-      keys.forEach(id => {
-        const txn = data[id];
-
-        const row = document.createElement("div");
-        row.className = "transaction-row";
-
-        row.innerHTML = `
-          <div>${txn.utr}</div>
-          <div>₹${txn.amount}</div>
-          <div>${txn.app}</div>
-          <div>${txn.status}</div>
-          <div>${txn.date}</div>
-          <div class="txn-btns">
-            <button class="reject-btn" onclick="updateStatus('${id}', 'rejected')">Reject</button>
-            <button class="approve-btn" onclick="updateStatus('${id}', 'approved')">Approve</button>
-          </div>
-        `;
-
-        txnList.appendChild(row);
-      });
-    }
+function renderTransactions() {
+  const tbody = document.getElementById('transactionBody');
+  tbody.innerHTML = '';
+  transactions.forEach((txn, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${txn.utr}</td>
+      <td>₹${txn.amount}</td>
+      <td>₹${txn.app}</td>
+      <td>${txn.date}</td>
+      <td>${txn.status}</td>
+      <td>
+        <button class="action-btn approve-btn" onclick="updateStatus(${index}, 'Approved')">Approve</button>
+        <button class="action-btn reject-btn" onclick="updateStatus(${index}, 'Rejected')">Reject</button>
+      </td>
+    `;
+    tbody.appendChild(row);
   });
+  updateChart();
 }
+
+function updateStatus(index, status) {
+  transactions[index].status = status;
+  renderTransactions();
+}
+
+document.addEventListener('DOMContentLoaded', renderTransactions);
 
 // -------- Update Status --------
 window.updateStatus = (id, status) => {
@@ -90,6 +91,47 @@ window.updateStatus = (id, status) => {
     loadTransactions();
   });
 };
+
+let statusChart;
+
+function updateChart() {
+  const statusCounts = transactions.reduce((counts, txn) => {
+    counts[txn.status] = (counts[txn.status] || 0) + 1;
+    return counts;
+  }, {});
+
+  const data = {
+    labels: ['Approved', 'Rejected', 'Pending'],
+    datasets: [{
+      label: 'Transaction Status',
+      data: [
+        statusCounts['Approved'] || 0,
+        statusCounts['Rejected'] || 0,
+        statusCounts['Pending'] || 0
+      ],
+      backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+    }]
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  };
+
+  if (statusChart) {
+    statusChart.destroy();
+  }
+  const ctx = document.getElementById('statusChart').getContext('2d');
+  statusChart = new Chart(ctx, config);
+}
 
 // -------- Show Toast --------
 function showToast(msg) {
