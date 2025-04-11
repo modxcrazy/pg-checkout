@@ -1,235 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dynamic UPI Payment</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart UPI Payment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrious"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
-      padding: 30px;
-      text-align: center;
-    }
-    h2 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-    .upi-options {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .upi-radio {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 20px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      cursor: pointer;
-      background: #fff;
-      transition: 0.3s;
-    }
-    .upi-radio:hover {
-      border-color: #2196f3;
-    }
-    .upi-radio input[type="radio"] {
-      display: none;
-    }
-    .upi-radio .icon {
-      width: 30px;
-      height: 30px;
-      background-size: cover;
-      border-radius: 5px;
-    }
-    .icon.phonepe {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f0/PhonePe_Logo.svg');
-      background-color: #5f259f;
-    }
-    .icon.gpay {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/5b/Google_Pay_Logo.svg');
-      background-color: #fff;
-      border: 1px solid #ccc;
-    }
-    .icon.paytm {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png');
-      background-color: #00b9f1;
-    }
-    .upi-radio input[type="radio"]:checked + .icon + span {
-      font-weight: bold;
-      color: #2196f3;
-    }
-    #qrContainer canvas {
-      margin-top: 20px;
-      border: 6px solid #eee;
-      padding: 10px;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-    }
-    #payBtn {
-      margin-top: 30px;
-      padding: 12px 30px;
-      font-size: 18px;
-      background-color: #2196f3;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 16px;
-      color: #555;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .page { width: 100%; max-width: 400px; }
+    .payment-card, .login-card, .dashboard { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-bottom: 20px; }
+    h2 { margin-bottom: 20px; text-align: center; }
+    .upi-options { display: flex; justify-content: space-around; margin-bottom: 15px; }
+    .upi-option { cursor: pointer; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; text-align: center; transition: 0.3s ease; width: 70px; }
+    .upi-option img { width: 40px; height: 40px; margin-bottom: 5px; }
+    .upi-option.active, .upi-option:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+    #qrCanvas { margin: 10px auto; background: white; padding: 10px; border-radius: 10px; display: block; }
+    #payBtn { padding: 12px 20px; background: #00c853; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; display: block; width: 100%; margin-top: 15px; }
+    #payBtn:hover { background: #00b347; }
+    #status { margin-top: 10px; font-weight: bold; text-align: center; }
+    #countdown { color: #ffca28; font-weight: bold; text-align: center; }
+    .switch-btn { margin-top: 15px; background: none; color: #90caf9; border: none; cursor: pointer; font-size: 14px; text-align: center; display: block; width: 100%; text-decoration: underline; }
+    .login-card input, .dashboard input { width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: none; }
+    #transactionList { max-height: 200px; overflow-y: auto; }
+    #transactionList li { background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 5px; }
+    canvas { max-width: 100%; margin-top: 20px; }
   </style>
 </head>
 <body>
+  <div class="page">
+    
+    <!-- USER SECTION -->
+    <div id="userSection" class="payment-card">
+      <h2>Make Payment</h2>
+      <div class="upi-options">
+        <div class="upi-option" data-app="phonepe"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fc/PhonePe_Logo.png" alt="PhonePe"><div>PhonePe</div></div>
+        <div class="upi-option" data-app="gpay"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Google_Pay_%28GPay%29_Logo.svg" alt="GPay"><div>GPay</div></div>
+        <div class="upi-option" data-app="paytm"><img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png" alt="Paytm"><div>Paytm</div></div>
+      </div>
+      <canvas id="qrCanvas"></canvas>
+      <div id="status">Select UPI App to Generate QR</div>
+      <div id="countdown"></div>
+      <button id="payBtn">Pay Now</button>
+      <button class="switch-btn" id="gotoAdmin">Admin Login</button>
+    </div>
 
-  <h2>Select UPI App</h2>
+    <!-- ADMIN LOGIN SECTION -->
+    <div id="adminLoginSection" class="login-card" style="display:none;">
+      <h2>Admin Login</h2>
+      <input type="email" id="adminEmail" placeholder="Email" />
+      <input type="password" id="adminPassword" placeholder="Password" />
+      <div id="loginError"></div>
+      <button id="adminLoginBtn">Login</button>
+    </div>
 
-  <div class="upi-options">
-    <label class="upi-radio">
-      <input type="radio" name="upiApp" value="phonepe">
-      <span class="icon phonepe"></span>
-      <span>PhonePe</span>
-    </label>
-    <label class="upi-radio">
-      <input type="radio" name="upiApp" value="gpay">
-      <span class="icon gpay"></span>
-      <span>Google Pay</span>
-    </label>
-    <label class="upi-radio">
-      <input type="radio" name="upiApp" value="paytm">
-      <span class="icon paytm"></span>
-      <span>Paytm</span>
-    </label>
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminDashboard" class="dashboard" style="display:none;">
+      <h2>Transactions</h2>
+      <input type="date" id="dateFilter" />
+      <ul id="transactionList"></ul>
+      <canvas id="chart" height="180"></canvas>
+      <button class="switch-btn" onclick="logoutAdmin()">Logout</button>
+    </div>
+
   </div>
 
-  <div id="qrContainer"></div>
-
-  <button id="payBtn">Pay Now</button>
-  <p id="status">Waiting for action...</p>
-
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
       authDomain: "pg-data-ed1c2.firebaseapp.com",
-      databaseURL: "https://pg-data-ed1c2-default-rtdb.firebaseio.com",
       projectId: "pg-data-ed1c2",
       storageBucket: "pg-data-ed1c2.appspot.com",
       messagingSenderId: "884858492190",
-      appId: "1:884858492190:web:67b7606ff790064ef3250f",
-      measurementId: "G-J73RD8EH7W"
+      appId: "1:884858492190:web:67b7606ff790064ef3250f"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    async function fetchUPI(appName) {
-      const snapshot = await get(ref(db, 'upi_ids/' + appName));
-      return snapshot.exists() ? snapshot.val() : null;
+    window.FB = { app, db, auth, ref, get, set, onValue, signInWithEmailAndPassword, signOut };
+
+    // MAIN SCRIPT
+    const payBtn = document.getElementById("payBtn");
+    const statusText = document.getElementById("status");
+    const countdownEl = document.getElementById("countdown");
+    const upiOptions = document.querySelectorAll(".upi-option");
+    const qrCanvas = document.getElementById("qrCanvas");
+    const qr = new QRious({ element: qrCanvas, size: 200 });
+
+    let selectedApp = null, upiID = "", countdownTime = 900, interval;
+
+    upiOptions.forEach(option => {
+      option.addEventListener("click", () => {
+        upiOptions.forEach(o => o.classList.remove("active"));
+        option.classList.add("active");
+        selectedApp = option.dataset.app;
+        fetchUPIID(selectedApp);
+      });
+    });
+
+    function fetchUPIID(app) {
+      FB.get(FB.ref(FB.db, `/upiApps/${app}`)).then(snapshot => {
+        if (snapshot.exists()) {
+          upiID = snapshot.val();
+          generateQR(upiID);
+          statusText.innerText = `QR generated for ${app}`;
+          startTimer();
+        } else {
+          statusText.innerText = `No UPI ID found`;
+        }
+      });
     }
 
-    function saveTransaction(data) {
-      set(ref(db, `transactions/${data.id}`), data);
+    function generateQR(upiId) {
+      const url = `upi://pay?pa=${upiId}&pn=Merchant&am=1&cu=INR`;
+      qr.value = url;
+      payBtn.onclick = () => {
+        window.open(url, '_blank');
+        logTransaction();
+      };
     }
 
-    function simulateVerify(txnId) {
-      setTimeout(async () => {
-        const txnRef = ref(db, `transactions/${txnId}`);
-        const snapshot = await get(txnRef);
+    function startTimer() {
+      clearInterval(interval);
+      countdownTime = 900;
+      interval = setInterval(() => {
+        let min = Math.floor(countdownTime / 60);
+        let sec = countdownTime % 60;
+        countdownEl.innerText = `${min}:${sec.toString().padStart(2, '0')}`;
+        if (countdownTime <= 0) {
+          clearInterval(interval);
+          statusText.innerText = "Session expired!";
+        }
+        countdownTime--;
+      }, 1000);
+    }
+
+    function logTransaction() {
+      const txRef = FB.ref(FB.db, `/transactions/${Date.now()}`);
+      FB.set(txRef, { upi: upiID, app: selectedApp, time: new Date().toLocaleString() });
+      statusText.innerText = "Payment recorded successfully!";
+    }
+
+    // Admin
+    const loginBtn = document.getElementById("adminLoginBtn");
+    const emailEl = document.getElementById("adminEmail");
+    const passEl = document.getElementById("adminPassword");
+    const errorEl = document.getElementById("loginError");
+    const transactionList = document.getElementById("transactionList");
+
+    loginBtn.onclick = () => {
+      FB.signInWithEmailAndPassword(FB.auth, emailEl.value, passEl.value)
+        .then(() => { showAdminDashboard(); errorEl.innerText = ""; })
+        .catch(() => errorEl.innerText = "Login failed!");
+    };
+
+    document.getElementById("gotoAdmin").onclick = () => {
+      document.getElementById("userSection").style.display = "none";
+      document.getElementById("adminLoginSection").style.display = "block";
+    };
+
+    function logoutAdmin() {
+      FB.signOut(FB.auth);
+      document.getElementById("adminDashboard").style.display = "none";
+      document.getElementById("userSection").style.display = "block";
+    }
+
+    function showAdminDashboard() {
+      document.getElementById("adminLoginSection").style.display = "none";
+      document.getElementById("adminDashboard").style.display = "block";
+      loadTransactions();
+    }
+
+    function loadTransactions() {
+      const path = FB.ref(FB.db, "/transactions/");
+      FB.onValue(path, snapshot => {
+        transactionList.innerHTML = "";
         if (snapshot.exists()) {
           const data = snapshot.val();
-          data.status = "success";
-          set(txnRef, data);
-          showSuccessAnimation();
-          playSuccessSound();
-          triggerVibration();
-          document.getElementById("status").innerText = "Payment Successful!";
+          Object.entries(data).forEach(([_, tx]) => {
+            const li = document.createElement("li");
+            li.textContent = `${tx.upi} | ${tx.time}`;
+            transactionList.appendChild(li);
+          });
+          updateChart(data);
         }
-      }, 4000);
-    }
-
-    function showSuccessAnimation() {
-      const msg = document.createElement("div");
-      msg.innerText = "✓ Payment Successful";
-      msg.style.position = "fixed";
-      msg.style.top = "50%";
-      msg.style.left = "50%";
-      msg.style.transform = "translate(-50%, -50%)";
-      msg.style.padding = "20px 40px";
-      msg.style.background = "#00e676";
-      msg.style.color = "#000";
-      msg.style.fontSize = "24px";
-      msg.style.fontWeight = "bold";
-      msg.style.borderRadius = "10px";
-      msg.style.boxShadow = "0 0 30px #00e676";
-      msg.style.zIndex = "9999";
-      document.body.appendChild(msg);
-      setTimeout(() => msg.remove(), 3000);
-    }
-
-    function playSuccessSound() {
-      const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-4.mp3");
-      audio.play();
-    }
-
-    function triggerVibration() {
-      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    }
-
-    const qr = new QRious({
-      element: document.createElement("canvas"),
-      size: 220,
-      value: ""
-    });
-    document.getElementById("qrContainer").appendChild(qr.element);
-
-    async function updateQR(appName) {
-      const upiId = await fetchUPI(appName);
-      if (!upiId) return;
-      const amount = 100;
-      const upiUrl = `upi://pay?pa=${upiId}&pn=Receiver&am=${amount}&tn=Payment&cu=INR`;
-      qr.set({ value: upiUrl });
-    }
-
-    document.querySelectorAll('input[name="upiApp"]').forEach(radio => {
-      radio.addEventListener("change", (e) => {
-        updateQR(e.target.value);
       });
-    });
+    }
 
-    document.getElementById("payBtn").addEventListener("click", async () => {
-      const selectedApp = document.querySelector('input[name="upiApp"]:checked')?.value;
-      if (!selectedApp) return alert("Select a UPI App first!");
+    // Chart + Date Filter
+    const dateInput = document.getElementById("dateFilter");
+    const ctx = document.getElementById("chart").getContext("2d");
+    let chartInstance;
 
-      const upiId = await fetchUPI(selectedApp);
-      if (!upiId) return alert("UPI ID not found!");
-
-      const amount = 100;
-      const txnId = "TXN" + Date.now();
-
-      saveTransaction({
-        id: txnId,
-        upi: upiId,
-        amount,
-        status: "pending",
-        createdAt: new Date().toISOString()
+    function updateChart(transactions) {
+      const dateMap = {};
+      Object.values(transactions).forEach(tx => {
+        const date = new Date(tx.time).toISOString().split("T")[0];
+        dateMap[date] = (dateMap[date] || 0) + 1;
       });
 
-      document.getElementById("status").innerText = "Checking payment status…";
-      simulateVerify(txnId);
+      const labels = Object.keys(dateMap);
+      const data = Object.values(dateMap);
 
-      const upiUrl = `upi://pay?pa=${upiId}&pn=Receiver&am=${amount}&tn=Payment&cu=INR`;
-      window.location.href = upiUrl;
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ label: 'Transactions per Day', data, backgroundColor: '#29b6f6' }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    dateInput.addEventListener("change", () => {
+      const selectedDate = dateInput.value;
+      FB.get(FB.ref(FB.db, "/transactions/")).then(snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const filtered = Object.fromEntries(
+            Object.entries(data).filter(([_, tx]) =>
+              new Date(tx.time).toISOString().startsWith(selectedDate)
+            )
+          );
+          transactionList.innerHTML = "";
+          Object.entries(filtered).forEach(([_, tx]) => {
+            const li = document.createElement("li");
+            li.textContent = `${tx.upi} | ${tx.time}`;
+            transactionList.appendChild(li);
+          });
+          updateChart(filtered);
+        }
+      });
     });
   </script>
-
 </body>
 </html>
