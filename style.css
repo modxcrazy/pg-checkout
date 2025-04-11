@@ -19,9 +19,18 @@
 .qr-img {
   width: 200px;
   height: 200px;
-  margin: 10px auto;
-  border: 5px solid #2ecc71;
   border-radius: 12px;
+  animation: pulseZoom 3s infinite ease-in-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes pulseZoom {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 .top-text, .bottom-text {
