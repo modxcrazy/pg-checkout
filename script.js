@@ -1,5 +1,17 @@
 import { db, ref, get, child, onValue } from './firebase-config.js';
 
+import { db, ref, get } from './firebase-config.js';
+
+async function fetchUPI(appName) {
+  const snapshot = await get(ref(db, 'upi_ids/' + appName));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } else {
+    console.error("UPI ID not found for", appName);
+    return null;
+  }
+}
+
 const qrCode = document.getElementById('qrCode');
 const timerElement = document.getElementById('timer');
 const payButton = document.getElementById('payButton');
