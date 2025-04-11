@@ -25,6 +25,16 @@
       <button id="saveUpiBtn">Save Settings</button>
     </div>
 
+    <!-- Dialog box for viewing transaction details -->
+  <div class="dialog" id="txnDialog">
+    <button class="close-btn" onclick="closeDialog()">Close</button>
+    <p><b>UTR:</b> <span id="dUtr"></span></p>
+    <p><b>Amount:</b> ₹<span id="dAmount"></span></p>
+    <p><b>UPI App:</b> <span id="dApp"></span></p>
+    <p><b>Status:</b> <span id="dStatus"></span></p>
+    <p><b>Date:</b> <span id="dDate"></span></p>
+  </div>
+    
     <!-- Green Tick Toast Popup -->
   <div id="toast" class="toast"><span class="tick">✔</span> Approved successfully!</div>
 
