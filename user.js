@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, push, get, child } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
@@ -11,70 +11,69 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const qrImage = document.getElementById("qrImage");
-const timerText = document.getElementById("timer");
-const payBtn = document.getElementById("payBtn");
-const successBox = document.getElementById("successAnimation");
+let selectedApp = "";
+let timer;
 
-let minutes = 15;
-let seconds = 0;
-let dynamicUpi = "";
-let dynamicAmount = "";
-
-// Load UPI ID & amount from Firebase
-async function loadUPIData() {
-  const snapshot = await get(child(ref(db), "settings"));
+// -------------------- Load UPI ID + Amount --------------------
+get(ref(db, "settings")).then(snapshot => {
   if (snapshot.exists()) {
-    dynamicUpi = snapshot.val().upiId;
-    dynamicAmount = snapshot.val().amount;
-    loadQR(dynamicUpi, dynamicAmount);
-  } else {
-    alert("Failed to load UPI settings.");
+    const { upi, amount } = snapshot.val();
+
+    document.getElementById("upiDisplay").textContent = upi;
+    document.getElementById("amtDisplay").textContent = "₹" + amount;
+
+    generateQR(upi, amount);
+    startTimer();
   }
-}
+});
 
-function loadQR(upi, amount) {
-  const encoded = encodeURIComponent(`upi://pay?pa=${upi}&am=${amount}&cu=INR`);
-  qrImage.src = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encoded}`;
-}
-
-function startTimer() {
-  setInterval(() => {
-    if (minutes === 0 && seconds === 0) return;
-    if (seconds === 0) {
-      minutes--;
-      seconds = 59;
-    } else {
-      seconds--;
-    }
-    timerText.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }, 1000);
-}
-
-payBtn.addEventListener("click", () => {
-  const utr = document.getElementById("utrNumber").value.trim();
-  if (!utr || utr.length < 5) {
-    alert("Please enter a valid UTR number.");
-    return;
-  }
-
-  const app = document.querySelector('input[name="upiApp"]:checked').value;
-
-  const data = {
-    utr: utr,
-    status: "pending",
-    date: new Date().toISOString().split("T")[0],
-    app: app,
-    amount: dynamicAmount,
-    upiId: dynamicUpi
-  };
-
-  push(ref(db, "transactions"), data).then(() => {
-    successBox.style.display = "block";
-    setTimeout(() => successBox.style.display = "none", 3000);
+// -------------------- UPI App Selection --------------------
+document.querySelectorAll("input[name='upiApp']").forEach(input => {
+  input.addEventListener("change", () => {
+    selectedApp = input.value;
   });
 });
 
-// INIT
-loadUPIData();
-startTimer();
+// -------------------- Generate UPI QR --------------------
+function generateQR(upi, amount) {
+  const qrURL = `upi://pay?pa=${upi}&am=${amount}&cu=INR`;
+  document.getElementById("qrImage").src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrURL)}`;
+}
+
+// -------------------- Start Countdown --------------------
+function startTimer() {
+  let timeLeft = 15 * 60; // 15 minutes in seconds
+  timer = setInterval(() => {
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    document.getElementById("timer").textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    timeLeft--;
+
+    if (timeLeft < 0) {
+      clearInterval(timer);
+      document.getElementById("timer").textContent = "Expired";
+    }
+  }, 1000);
+}
+
+// -------------------- Handle Payment --------------------
+document.getElementById("payBtn").addEventListener("click", () => {
+  const utr = document.getElementById("utr").value.trim();
+  if (!selectedApp) return alert("Please select a UPI App!");
+  if (!utr || utr.length < 6) return alert("Enter a valid UTR number!");
+
+  const amount = document.getElementById("amtDisplay").textContent.replace("₹", "");
+  const upi = document.getElementById("upiDisplay").textContent;
+  const date = new Date().toISOString().split("T")[0];
+
+  const txnId = Date.now();
+
+  set(ref(db, "transactions/" + txnId), {
+    utr: utr,
+    status: "pending",
+    amount: amount,
+    date: date
+  }).then(() => {
+    alert("Payment submitted! Please wait for approval.");
+  });
+});
