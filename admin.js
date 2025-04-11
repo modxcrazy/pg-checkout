@@ -30,7 +30,8 @@ function loadTransactions() {
     const div = document.createElement("div");
     div.className = "card";
     div.innerHTML = `
-      <span>${txn.date}</span>
+      <span>${txn.utr}</span>
+      <span>${txn.amount}</span>
       <button onclick='approveTransaction("${key}")'>Approve</button>
       <button onclick='showDialog(${JSON.stringify(txn)})'>View</button>
     `;
