@@ -24,7 +24,7 @@ onAuthStateChanged(auth, user => {
 // -------- LogOut Button --------
 document.getElementById("logoutBtn").addEventListener("click", () => {
   signOut(auth).then(() => {
-    window.location.href = "login.html";
+    window.location.href = "admin-login.html";
   });
 });
 
