@@ -79,3 +79,32 @@ function showToast(msg) {
 
 document.getElementById("filterDate").addEventListener("change", loadTransactions);
 loadTransactions();
+
+// Function to approve a transaction
+function approveTransaction(txnId) {
+  const txnRef = ref(db, "transactions/" + txnId);
+  set(txnRef, {
+    ...data[txnId],
+    status: "approved"  // Mark as approved
+  }).then(() => {
+    alert("Transaction approved successfully!");
+    location.reload(); // Refresh the page to reflect the updated status
+  }).catch(error => {
+    alert("Error: " + error.message);
+  });
+}
+
+// Function to show transaction details in a dialog
+function showDialog(txn) {
+  document.getElementById("dUtr").textContent = txn.utr;
+  document.getElementById("dAmount").textContent = txn.amount;
+  document.getElementById("dApp").textContent = txn.app || 'N/A';
+  document.getElementById("dStatus").textContent = txn.status;
+  document.getElementById("dDate").textContent = txn.date;
+  document.getElementById("txnDialog").style.display = "block";
+}
+
+// Function to close the dialog
+function closeDialog() {
+  document.getElementById("txnDialog").style.display = "none";
+}
