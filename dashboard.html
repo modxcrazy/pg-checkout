@@ -10,12 +10,30 @@
 <body>
   <div class="admin-panel">
     <h2>Admin Dashboard</h2>
+
+    <!-- UPI Settings Update Section (Step 2) -->
+    <div class="card">
+      <h3>Update UPI Settings</h3>
+      <div class="form-group">
+        <label for="adminUpi">UPI ID</label>
+        <input type="text" id="adminUpi" placeholder="Enter UPI ID" />
+      </div>
+      <div class="form-group">
+        <label for="adminAmount">Amount</label>
+        <input type="number" id="adminAmount" placeholder="Enter Amount" />
+      </div>
+      <button id="saveUpiBtn">Save Settings</button>
+    </div>
+
+    <!-- Transaction Filter + List -->
     <input type="date" id="filterDate">
     <div id="txnList" class="transaction-list"></div>
     <canvas id="txnChart" height="100"></canvas>
   </div>
 
+  <!-- Toast Notification -->
   <div id="toast" class="toast">Approved successfully!</div>
+
   <script type="module" src="admin.js"></script>
 </body>
 </html>
