@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebas
 import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
   authDomain: "pg-data-ed1c2.firebaseapp.com",
@@ -9,18 +10,22 @@ const firebaseConfig = {
   projectId: "pg-data-ed1c2"
 };
 
+// Init
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth();
 
+// Auth Guard
 onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "login.html";
 });
 
+// Logout
 document.getElementById("logoutBtn").addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "admin-login.html");
 });
 
+// Save UPI Settings
 document.getElementById("saveUpiBtn").addEventListener("click", () => {
   const upi = document.getElementById("adminUpi").value.trim();
   const amount = document.getElementById("adminAmount").value.trim();
@@ -29,25 +34,38 @@ document.getElementById("saveUpiBtn").addEventListener("click", () => {
   set(ref(db, "settings"), { upi, amount }).then(() => showToast("Settings updated!"));
 });
 
-// Live Transactions Array
+// Transaction Storage
 const transactions = [];
 
-// Firebase Live Listener for Transactions
+// Track Last Count for Notification
+let previousTransactionCount = 0;
+
+// Preload Notification Sound
+const notificationSound = new Audio("https://www.soundjay.com/buttons/sounds/button-29.mp3");
+notificationSound.load();
+
+// Firebase Transaction Listener
 const transactionsRef = ref(db, "transactions");
 onValue(transactionsRef, snapshot => {
   const data = snapshot.val();
   if (!data) return;
 
-  transactions.length = 0; // Clear previous entries
-  Object.keys(data).forEach(key => {
+  const newTransactionKeys = Object.keys(data);
+  if (newTransactionKeys.length > previousTransactionCount) {
+    playNotificationEffects(); // New transaction detected
+    showNotificationPopup("New transaction received!");
+  }
+  previousTransactionCount = newTransactionKeys.length;
+
+  transactions.length = 0;
+  newTransactionKeys.forEach(key => {
     transactions.push({ id: key, ...data[key] });
   });
 
   renderTransactions();
-  showToast("Transactions updated!");
 });
 
-// Render Transactions into Table
+// Render Transactions Table
 function renderTransactions() {
   const tbody = document.getElementById("transactionBody");
   tbody.innerHTML = "";
@@ -70,7 +88,7 @@ function renderTransactions() {
   updateChart();
 }
 
-// Update Status in Firebase
+// Update Transaction Status
 window.updateStatus = (id, status) => {
   update(ref(db, "transactions/" + id), { status })
     .then(() => {
@@ -78,7 +96,7 @@ window.updateStatus = (id, status) => {
     });
 };
 
-// Update Chart
+// Chart Update
 function updateChart() {
   const counts = transactions.reduce((acc, t) => {
     acc[t.status] = (acc[t.status] || 0) + 1;
@@ -104,10 +122,42 @@ function updateChart() {
   });
 }
 
-// Show Toast
+// Toast Notification
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.innerHTML = `<span class="tick">✔</span> ${msg}`;
   toast.style.display = "block";
   setTimeout(() => (toast.style.display = "none"), 3000);
+}
+
+// Theme Switcher
+document.getElementById('themeSwitch').addEventListener('change', function () {
+  if (this.checked) {
+    document.body.classList.remove('light-theme');
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
+    document.body.classList.add('light-theme');
+  }
+});
+
+// Notification Popup Animation
+function showNotificationPopup(msg = "New transaction received!") {
+  const popup = document.getElementById("notifPopup");
+  popup.textContent = msg;
+  popup.style.display = "block";
+  setTimeout(() => popup.style.display = "none", 4000);
+}
+
+// Notification Effects
+function playNotificationEffects() {
+  notificationSound.play().catch(e => console.warn("Audio play error:", e));
+
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+  const bell = document.getElementById("notificationBell");
+  if (bell) {
+    bell.classList.add("shake-bell");
+    setTimeout(() => bell.classList.remove("shake-bell"), 1000);
+  }
 }
