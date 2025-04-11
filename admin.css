@@ -1,54 +1,77 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
-  padding: 20px;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #111;
+  color: #fff;
 }
 
-.admin-container {
-  max-width: 800px;
+.login-container, .admin-panel {
+  max-width: 500px;
   margin: auto;
-  background: #fff;
-  padding: 25px;
+  padding: 30px;
+  background: #222;
   border-radius: 10px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  margin-top: 60px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
+input, button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
 }
 
-.transactions {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.transaction-card {
-  background: #f3f3f3;
-  border-left: 5px solid #2196F3;
-  padding: 15px;
-  border-radius: 8px;
-}
-
-.transaction-card p {
-  margin: 6px 0;
-}
-
-.status {
-  font-weight: bold;
+input {
+  background: #333;
+  color: #fff;
 }
 
 button {
-  padding: 8px 14px;
-  background: green;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background: #28a745;
+  color: #fff;
   cursor: pointer;
-  margin-top: 8px;
+  transition: 0.3s;
 }
 
 button:hover {
-  background: darkgreen;
+  background: #218838;
+}
+
+.card {
+  background: #1e1e1e;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 0 8px #000;
+}
+
+.toast {
+  visibility: hidden;
+  position: fixed;
+  right: 20px;
+  bottom: 30px;
+  background-color: #28a745;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 999;
+}
+
+.toast.show {
+  visibility: visible;
+  animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+}
+
+@keyframes fadeIn {
+  from {bottom: 10px; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeOut {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 10px; opacity: 0;}
 }
