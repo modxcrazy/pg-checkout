@@ -6,25 +6,6 @@
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
-    authDomain: "pg-data-ed1c2.firebaseapp.com",
-    projectId: "pg-data-ed1c2"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "admin-login.html"; // Redirect if not logged in
-    }
-  });
-</script>
 </head>
 <body class="dark-theme">
 
