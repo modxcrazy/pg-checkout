@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getDatabase, ref, set, update, onValue, remove } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-import { ref, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -20,7 +19,7 @@ const auth = getAuth(app);
 onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "admin-login.html";
 });
-  
+
 // Logout
 document.getElementById("logoutBtn").addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "admin-login.html");
@@ -37,11 +36,9 @@ document.getElementById("saveUpiBtn").addEventListener("click", () => {
 
 // Transaction Storage
 const transactions = [];
-
-// Track Last Count for Notification
 let previousTransactionCount = 0;
 
-// Preload Notification Sound
+// Notification Sound
 const notificationSound = new Audio("https://www.soundjay.com/buttons/sounds/button-29.mp3");
 notificationSound.load();
 
@@ -53,7 +50,7 @@ onValue(transactionsRef, snapshot => {
 
   const newTransactionKeys = Object.keys(data);
   if (newTransactionKeys.length > previousTransactionCount) {
-    playNotificationEffects(); // New transaction detected
+    playNotificationEffects();
     showNotificationPopup("New transaction received!");
   }
   previousTransactionCount = newTransactionKeys.length;
@@ -81,6 +78,7 @@ function renderTransactions() {
       <td>
         <button class="approve-btn" onclick="updateStatus('${txn.id}', 'Approved')">Approve</button>
         <button class="reject-btn" onclick="updateStatus('${txn.id}', 'Rejected')">Reject</button>
+        <button class="btn-delete" onclick="deleteTransaction('${txn.id}')">Delete</button>
       </td>
     `;
     tbody.appendChild(row);
@@ -97,7 +95,21 @@ window.updateStatus = (id, status) => {
     });
 };
 
-// Chart Update
+// Delete Transaction
+window.deleteTransaction = (id) => {
+  if (confirm("Are you sure you want to delete this transaction?")) {
+    remove(ref(db, `transactions/${id}`))
+      .then(() => {
+        showToast("Transaction deleted!");
+      })
+      .catch((error) => {
+        console.error("Delete failed:", error);
+        showToast("Error deleting transaction!");
+      });
+  }
+};
+
+// Update Chart
 function updateChart() {
   const counts = transactions.reduce((acc, t) => {
     acc[t.status] = (acc[t.status] || 0) + 1;
@@ -142,7 +154,7 @@ document.getElementById('themeSwitch').addEventListener('change', function () {
   }
 });
 
-// Notification Popup Animation
+// Notification Popup
 function showNotificationPopup(msg = "New transaction received!") {
   const popup = document.getElementById("notifPopup");
   popup.textContent = msg;
@@ -150,10 +162,9 @@ function showNotificationPopup(msg = "New transaction received!") {
   setTimeout(() => popup.style.display = "none", 4000);
 }
 
-// Notification Effects
+// Effects on New Transaction
 function playNotificationEffects() {
   notificationSound.play().catch(e => console.warn("Audio play error:", e));
-
   if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
   const bell = document.getElementById("notificationBell");
@@ -162,22 +173,3 @@ function playNotificationEffects() {
     setTimeout(() => bell.classList.remove("shake-bell"), 1000);
   }
 }
-
-/!----- Now Added History Delete---->
-const deleteBtn = document.createElement('button');
-deleteBtn.textContent = "Delete";
-deleteBtn.className = "btn-delete";
-deleteBtn.onclick = () => {
-  if (confirm("Are you sure you want to delete this transaction?")) {
-    const transactionRef = ref(db, `transactions/${transactionKey}`);
-    remove(transactionRef)
-      .then(() => {
-        showToast("Transaction deleted!", "red");
-      })
-      .catch((error) => {
-        console.error("Delete failed:", error);
-        showToast("Error deleting transaction!", "red");
-      });
-  }
-};
-row.appendChild(deleteBtn);
