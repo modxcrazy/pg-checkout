@@ -36,6 +36,15 @@ function generateQR(upi, amount) {
   document.getElementById("qrImage").src = qrImgURL;
 }
 
+document.getElementById("qrLoader").style.display = "block";
+document.getElementById("qrImage").style.display = "none";
+
+fetchQrFromFirebase().then(qrUrl => {
+  document.getElementById("qrImage").src = qrUrl;
+  document.getElementById("qrLoader").style.display = "none";
+  document.getElementById("qrImage").style.display = "block";
+});
+
 // -------------------- Start Countdown --------------------
 function startTimer() {
   timerInterval = setInterval(() => {
@@ -87,3 +96,18 @@ document.getElementById("payBtn").addEventListener("click", () => {
     selectedApp = "";
   });
 });
+
+function showSuccessAnimation() {
+  const successBox = document.getElementById("successAnimation");
+  successBox.style.display = "block";
+  playSuccessSound();
+  setTimeout(() => {
+    successBox.style.display = "none";
+    location.reload(); // auto refresh
+  }, 4000);
+}
+
+function playSuccessSound() {
+  const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
+  audio.play().catch(err => console.warn("Audio playback failed:", err));
+}
