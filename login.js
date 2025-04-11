@@ -22,7 +22,7 @@ document.getElementById("loginBtn").addEventListener("click", () => {
 
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
-      window.location.href = "admin.html";
+      window.location.href = "dashboard.html";
     })
     .catch(error => {
       let msg = "Login failed!";
