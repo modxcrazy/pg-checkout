@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getDatabase, ref, get, update, set } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
@@ -13,6 +13,7 @@ const db = getDatabase(app);
 
 let chartInstance;
 
+// ------------------------ Load Transactions + Chart -------------------------
 function loadTransactions() {
   get(ref(db, "transactions")).then(snapshot => {
     const data = snapshot.val();
@@ -56,6 +57,25 @@ function loadTransactions() {
   });
 }
 
+// ------------------------ Dynamic UPI ID + Amount Save ----------------------
+document.getElementById("saveUpiBtn").addEventListener("click", () => {
+  const upiId = document.getElementById("adminUpi").value;
+  const amount = document.getElementById("adminAmount").value;
+
+  if (!upiId || !amount) {
+    showToast("Please enter both UPI ID and Amount");
+    return;
+  }
+
+  set(ref(db, "settings"), {
+    upi: upiId,
+    amount: amount
+  }).then(() => {
+    showToast("UPI & Amount Updated!");
+  });
+});
+
+// ------------------------ Show Chart ------------------------
 function showChart(approved, pending) {
   const ctx = document.getElementById("txnChart").getContext("2d");
   if (chartInstance) chartInstance.destroy();
@@ -72,6 +92,7 @@ function showChart(approved, pending) {
   });
 }
 
+// ------------------------ Show Toast ------------------------
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.textContent = msg;
@@ -79,5 +100,6 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
+// ------------------------ Initial Load ------------------------
 document.getElementById("filterDate").addEventListener("change", loadTransactions);
 loadTransactions();
