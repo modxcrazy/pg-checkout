@@ -4,7 +4,152 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UPI Payment</title>
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .user-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      color: #fff;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .qr-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .qr-img {
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+      border-radius: 12px;
+      margin: 15px 0;
+      border: 2px solid #fff;
+    }
+
+    .top-text, .bottom-text {
+      font-size: 14px;
+      color: #e0e0e0;
+    }
+
+    .upi-details p {
+      font-size: 16px;
+      margin: 10px 0;
+      color: #fff;
+    }
+
+    .upi-apps {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .upi-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 10px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .upi-option input {
+      margin-bottom: 6px;
+    }
+
+    .upi-option img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 5px;
+      background: white;
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    #utr {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .glow-btn {
+      background: linear-gradient(to right, #00f2fe, #4facfe);
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      box-shadow: 0 0 15px #00f2fe;
+      transition: all 0.3s ease;
+    }
+
+    .glow-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #00f2fe;
+    }
+
+    .success-animation {
+      display: none;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #00ff95;
+      animation: pop 0.6s ease forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @media(max-width: 500px) {
+      .qr-img {
+        width: 160px;
+        height: 160px;
+      }
+
+      .user-container {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="user-container">
@@ -21,31 +166,23 @@
       <p><strong>Amount:</strong> <span id="amtDisplay">₹0</span></p>
     </div>
 
-    <!---
     <div class="upi-apps">
-      <label><input type="radio" name="upiApp" value="PhonePe"> PhonePe</label>
-      <label><input type="radio" name="upiApp" value="GPay"> Google Pay</label>
-      <label><input type="radio" name="upiApp" value="Paytm"> Paytm</label>
+      <label class="upi-option">
+        <input type="radio" name="upiApp" value="PhonePe" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/PhonePe_Logo.png" alt="PhonePe" />
+        PhonePe
+      </label>
+      <label class="upi-option">
+        <input type="radio" name="upiApp" value="GPay" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Google_Pay_Logo.svg" alt="GPay" />
+        Google Pay
+      </label>
+      <label class="upi-option">
+        <input type="radio" name="upiApp" value="Paytm" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png" alt="Paytm" />
+        Paytm
+      </label>
     </div>
-    --->
-
-    <div class="upi-apps">
-  <label class="upi-option">
-    <input type="radio" name="upiApp" value="PhonePe" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/PhonePe_Logo.png" alt="PhonePe" />
-    PhonePe
-  </label>
-  <label class="upi-option">
-    <input type="radio" name="upiApp" value="GPay" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Google_Pay_Logo.svg" alt="GPay" />
-    Google Pay
-  </label>
-  <label class="upi-option">
-    <input type="radio" name="upiApp" value="Paytm" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png" alt="Paytm" />
-    Paytm
-  </label>
-</div>
 
     <input type="text" id="utr" placeholder="Enter UTR Number" />
     <button id="payBtn" class="glow-btn">I Have Paid</button>
