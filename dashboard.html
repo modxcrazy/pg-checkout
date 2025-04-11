@@ -4,205 +4,71 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
-    body {
-      background-color: #0f172a;
-      color: #f8fafc;
-      padding: 40px 60px;
-    }
-
-    h1 {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 25px;
-      color: #22d3ee;
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .btn {
-      background: #22d3ee;
-      border: none;
-      color: #0f172a;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-      background: #0ea5e9;
-      color: white;
-    }
-
-    .section {
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-
-    .section h2 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #38bdf8;
-    }
-
-    .form-group input {
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      margin-right: 12px;
-      width: 220px;
-      font-size: 14px;
-      background: #334155;
-      color: white;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #1e293b;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    thead {
-      background-color: #334155;
-    }
-
-    th, td {
-      padding: 14px 18px;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    th {
-      color: #cbd5e1;
-      font-weight: 600;
-    }
-
-    tbody tr:nth-child(even) {
-      background-color: #273549;
-    }
-
-    .approve-btn, .reject-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .approve-btn {
-      background-color: #16a34a;
-      color: #fff;
-      margin-right: 10px;
-    }
-
-    .reject-btn {
-      background-color: #dc2626;
-      color: #fff;
-    }
-
-    .approve-btn:hover {
-      background-color: #15803d;
-    }
-
-    .reject-btn:hover {
-      background-color: #b91c1c;
-    }
-
-    #toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #22c55e;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      display: none;
-      font-weight: 600;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    }
-
-    canvas {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 20px;
-      }
-      .form-group input {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      .btn {
-        width: 100%;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="dark-theme">
 
-  <div class="top-bar">
-    <h1>Admin Dashboard</h1>
-    <button id="logoutBtn" class="btn">Logout</button>
-  </div>
-
-  <div class="section">
-    <h2>Update UPI Settings</h2>
-    <div class="form-group">
-      <input type="text" id="adminUpi" placeholder="Enter UPI ID" />
-      <input type="number" id="adminAmount" placeholder="Enter Amount" />
-      <button id="saveUpiBtn" class="btn">Save Settings</button>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Transactions</a></li>
+      <li><a href="#">Settings</a></li>
+      <li><button id="logoutBtn">Logout</button></li>
+    </ul>
+    <div class="theme-toggle">
+      <label>Dark Mode</label>
+      <input type="checkbox" id="themeSwitch" checked />
     </div>
   </div>
 
-  <div class="section">
-    <h2>Live Transactions</h2>
-    <table>
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="top-bar">
+      <h2>Admin Dashboard</h2>
+      <div class="notification-bell">
+        <span id="notifIcon">🔔</span>
+        <div id="notifPopup" class="notif-popup">New transaction received!</div>
+      </div>
+    </div>
+
+    <!-- UPI Settings Update Section -->
+    <div class="card">
+      <h3>Update UPI Settings</h3>
+      <div class="form-group">
+        <label for="adminUpi">UPI ID</label>
+        <input type="text" id="adminUpi" placeholder="Enter UPI ID" />
+      </div>
+      <div class="form-group">
+        <label for="adminAmount">Amount</label>
+        <input type="number" id="adminAmount" placeholder="Enter Amount" />
+      </div>
+      <button id="saveUpiBtn">Save Settings</button>
+    </div>
+
+    <!-- Transaction Table -->
+    <table class="txn-table">
       <thead>
         <tr>
-          <th>UTR</th>
+          <th>UTR Number</th>
           <th>Amount</th>
           <th>App</th>
           <th>Date</th>
           <th>Status</th>
-          <th>Actions</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody id="transactionBody"></tbody>
     </table>
+
+    <canvas id="statusChart" height="100"></canvas>
   </div>
 
-  <div class="section">
-    <h2>Transaction Status Chart</h2>
-    <canvas id="statusChart" height="120"></canvas>
-  </div>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">Approved successfully!</div>
 
-  <div id="toast"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="admin.js"></script>
 </body>
 </html>
