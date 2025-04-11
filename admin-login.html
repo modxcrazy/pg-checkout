@@ -4,7 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Login</title>
-  <link rel="stylesheet" href="login.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to right, #1c92d2, #f2fcfe);
+      background-size: cover;
+      overflow: hidden;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .login-container h2 {
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 15px;
+      transition: background 0.3s ease;
+    }
+
+    .login-container input::placeholder {
+      color: #ddd;
+    }
+
+    .login-container input:focus {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background-image: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .login-container button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+    }
+
+    .error-text {
+      color: #ff4d4d;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
