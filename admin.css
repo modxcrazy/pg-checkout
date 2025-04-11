@@ -76,6 +76,11 @@ button:hover {
   to {bottom: 10px; opacity: 0;}
 }
 
+.card p {
+  margin: 5px 0;
+  color: #000; /* Text color set to black */
+}
+
 .card {
   background: #fff;
   padding: 20px;
