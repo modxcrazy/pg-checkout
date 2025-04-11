@@ -1,3 +1,4 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
@@ -33,24 +34,27 @@ function generateQR(upi, amount) {
   const qrURL = `upi://pay?pa=${upi}&pn=In99Soft&am=${amount}&cu=INR`;
   const encodedURL = encodeURIComponent(qrURL);
   const qrImgURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedURL}`;
-  document.getElementById("qrImage").src = qrImgURL;
+
+  const qrImage = document.getElementById("qrImage");
+  const qrLoader = document.getElementById("qrLoader");
+  qrLoader.style.display = "block";
+  qrImage.style.display = "none";
+
+  const img = new Image();
+  img.onload = () => {
+    qrImage.src = qrImgURL;
+    qrLoader.style.display = "none";
+    qrImage.style.display = "block";
+  };
+  img.src = qrImgURL;
 }
-
-document.getElementById("qrLoader").style.display = "block";
-document.getElementById("qrImage").style.display = "none";
-
-fetchQrFromFirebase().then(qrUrl => {
-  document.getElementById("qrImage").src = qrUrl;
-  document.getElementById("qrLoader").style.display = "none";
-  document.getElementById("qrImage").style.display = "block";
-});
 
 // -------------------- Start Countdown --------------------
 function startTimer() {
   timerInterval = setInterval(() => {
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
-    document.getElementById("timer").textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    document.getElementById("timer").textContent = \`\${mins}:\${secs < 10 ? '0' : ''}\${secs}\`;
     timeLeft--;
 
     if (timeLeft < 0) {
@@ -89,7 +93,7 @@ document.getElementById("payBtn").addEventListener("click", () => {
     app: selectedApp,
     date: date
   }).then(() => {
-    alert("Payment submitted! Please wait for approval.");
+    showSuccessAnimation();
     document.getElementById("utr").value = "";
     document.querySelectorAll(".upi-option").forEach(opt => opt.classList.remove("selected"));
     document.querySelectorAll("input[name='upiApp']").forEach(r => r.checked = false);
@@ -97,6 +101,7 @@ document.getElementById("payBtn").addEventListener("click", () => {
   });
 });
 
+// -------------------- Success Animation --------------------
 function showSuccessAnimation() {
   const successBox = document.getElementById("successAnimation");
   successBox.style.display = "block";
@@ -107,6 +112,7 @@ function showSuccessAnimation() {
   }, 4000);
 }
 
+// -------------------- Success Sound --------------------
 function playSuccessSound() {
   const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
   audio.play().catch(err => console.warn("Audio playback failed:", err));
