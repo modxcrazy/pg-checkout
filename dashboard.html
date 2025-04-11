@@ -8,12 +8,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <button id="logoutBtn">Logout</button>
-  
   <div class="admin-panel">
+    <button id="logoutBtn">Logout</button>
     <h2>Admin Dashboard</h2>
 
-    <!-- UPI Settings Update Section (Step 2) -->
+    <!-- UPI Settings Update Section -->
     <div class="card">
       <h3>Update UPI Settings</h3>
       <div class="form-group">
@@ -27,28 +26,14 @@
       <button id="saveUpiBtn">Save Settings</button>
     </div>
 
-    <!-- Green Tick Toast Popup -->
-  <div id="toast" class="toast"><span class="tick">✔</span> Approved successfully!</div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"><span class="tick">✔</span> Approved successfully!</div>
 
-    <div class="transaction-row">
-      <div>UTR123456</div>
-      <div>₹200</div>
-      <div>PhonePe</div>
-      <div>pending</div>
-      <div>2025-04-11</div>
-      <div class="txn-btns">
-    <button class="reject-btn" onclick="updateStatus('txnId', 'rejected')">Reject</button>
-    <button class="approve-btn" onclick="updateStatus('txnId', 'approved')">Approve</button>
-  </div>
-</div>
-    
     <!-- Transaction Filter + List -->
+    <input type="date" id="filterDate">
     <div id="txnList" class="transaction-list"></div>
     <canvas id="txnChart" height="100"></canvas>
   </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="toast">Approved successfully!</div>
 
   <script type="module" src="admin.js"></script>
 </body>
