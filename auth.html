@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login & Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+      height: 100vh;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    h2 { margin-bottom: 20px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      background: linear-gradient(to right, #00f2fe, #4facfe);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    button:hover { transform: scale(1.05); }
+    .toggle { margin-top: 15px; cursor: pointer; text-decoration: underline; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-box">
+    <h2 id="formTitle">Login</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="submitBtn">Login</button>
+    <div class="toggle" onclick="toggleForm()">Don't have an account? Register</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCn553qWsVz2VF1dZ4Ji5OkQDGFvMORbJE",
+      authDomain: "pg-data-ed1c2.firebaseapp.com",
+      databaseURL: "https://pg-data-ed1c2-default-rtdb.firebaseio.com",
+      projectId: "pg-data-ed1c2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let isLogin = true;
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) return alert("Enter email and password");
+
+      if (isLogin) {
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => window.location.href = "home.html")
+          .catch(err => alert(err.message));
+      } else {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then(userCred => {
+            const uid = userCred.user.uid;
+            set(ref(db, "users/" + uid), {
+              email,
+              joined: new Date().toISOString()
+            }).then(() => {
+              alert("Registration Successful!");
+              toggleForm();
+            });
+          })
+          .catch(err => alert(err.message));
+      }
+    });
+
+    window.toggleForm = () => {
+      isLogin = !isLogin;
+      document.getElementById("formTitle").textContent = isLogin ? "Login" : "Register";
+      document.getElementById("submitBtn").textContent = isLogin ? "Login" : "Register";
+      document.querySelector(".toggle").textContent = isLogin ? "Don't have an account? Register" : "Already have an account? Login";
+    };
+  </script>
+</body>
+</html>
