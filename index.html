@@ -32,10 +32,6 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
       color: #fff;
       text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
     }
 
     h2 {
@@ -43,13 +39,20 @@
       font-weight: 600;
     }
 
-    .qr-card {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
+    .container {
+  display: flex;
+  justify-content: center;   /* Horizontal center */
+  align-items: center;       /* Vertical center */
+  min-height: 100vh;         /* Full viewport height */
+  background: #f0f0f0;       /* Optional: background for contrast */
+}
+
+.qr-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
 
     .qr-img {
       width: 200px;
