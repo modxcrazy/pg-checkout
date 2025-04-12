@@ -45,18 +45,18 @@
   padding: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
-  justify-content: center;   /* Horizontal center */
-  
+  align-items: center;
 }
 
     .qr-img {
-      width: 200px;
-      height: 200px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin: 15px 0;
-      border: 2px solid #fff;
-    }
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin: 15px auto; /* Center horizontally */
+  border: 2px solid #fff;
+  display: block;    /* Important for margin auto to work */
+}
 
     .top-text, .bottom-text {
       font-size: 14px;
