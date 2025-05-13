@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Call Bomber Simulator 2025</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white font-sans">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-pink-600 flex items-center">
+      <span class="mr-2">📞</span> Call Bomber
+    </h1>
+    <button onclick="toggleDark()" class="bg-gray-200 dark:bg-gray-600 px-3 py-1 rounded">🌓</button>
+  </header>
+
+  <!-- Alert Box -->
+  <div class="bg-red-100 text-red-700 p-4 mx-4 my-3 rounded shadow">
+    <strong>Important:</strong> This simulator is for fun/demo only. It does NOT send real calls.
+  </div>
+
+  <!-- Main Form -->
+  <main class="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 mt-4 rounded-lg shadow">
+    <h2 class="text-2xl font-bold mb-4 text-center">Free Call Bomber Simulator</h2>
+
+    <div class="mb-4">
+      <label class="block mb-1 font-semibold">Enter Phone Number:</label>
+      <div class="flex">
+        <span class="bg-blue-500 text-white px-3 py-2 rounded-l">+91</span>
+        <input type="number" id="phoneInput" class="w-full p-2 border border-gray-300 rounded-r" placeholder="Enter 10-digit number">
+      </div>
+    </div>
+
+    <div class="mb-4 flex items-center">
+      <input type="checkbox" id="agree" class="mr-2">
+      <label for="agree">I agree to the <a href="#" class="text-blue-500 underline">Terms & Conditions</a></label>
+    </div>
+
+    <button onclick="startBombing()" class="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition">🚀 Launch Bombing</button>
+
+    <!-- Bombing Status -->
+    <div id="bombingSection" class="hidden mt-6 bg-purple-100 dark:bg-purple-700 p-4 rounded text-center">
+      <h3 class="text-xl font-bold mb-2">Call Bombing Started!</h3>
+      <p>Target Number: <span id="targetNum" class="font-mono font-semibold"></span></p>
+      <p class="mt-2">Bombing in progress...</p>
+      <div class="mt-3 text-sm">Next wave in: <span id="timer">3</span> seconds</div>
+      <button onclick="stopBombing()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">STOP BOMBING</button>
+    </div>
+  </main>
+
+  <!-- Footer Telegram -->
+  <footer class="text-center mt-6 p-4">
+    <a href="#" class="text-blue-500 hover:underline">Join our Telegram Channel</a>
+  </footer>
+
+  <script>
+    let timerInterval;
+
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+    }
+
+    function startBombing() {
+      const phone = document.getElementById('phoneInput').value;
+      const agree = document.getElementById('agree').checked;
+      const section = document.getElementById('bombingSection');
+      const targetNum = document.getElementById('targetNum');
+
+      if (!agree || phone.length !== 10) {
+        alert("Enter valid number and agree to T&Cs.");
+        return;
+      }
+
+      section.classList.remove("hidden");
+      targetNum.innerText = phone;
+
+      let countdown = 3;
+      document.getElementById('timer').innerText = countdown;
+      timerInterval = setInterval(() => {
+        countdown--;
+        document.getElementById('timer').innerText = countdown;
+        if (countdown <= 0) countdown = 3;
+      }, 1000);
+    }
+
+    function stopBombing() {
+      clearInterval(timerInterval);
+      document.getElementById('bombingSection').classList.add("hidden");
+      alert("Bombing stopped (simulation only).");
+    }
+  </script>
+</body>
+</html>
