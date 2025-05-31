@@ -190,13 +190,14 @@
         const data = snapshot.val();
         document.getElementById('upi-id').textContent = data.upiId;
         document.getElementById('amount').textContent = `₹${data.amount}`;
-        generateQR(data.upiId, data.amount);
+        document.getElementById('name').textContent = data.name;
+        generateQR(data.upiId, data.amount, data.name);
       });
     }
 
     // Generate QR Code
-    function generateQR(upiId, amount) {
-      const qrData = `upi://pay?pa=${upiId}&pn=RecipientName&am=${amount}&cu=INR`;
+    function generateQR(upiId, amount, name) {
+      const qrData = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
       new QRCode(document.getElementById("qr-code"), {
         text: qrData,
         width: 200,
