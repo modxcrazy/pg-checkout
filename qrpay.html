@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UPI QR Payment Gateway</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .payment-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      padding: 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .tagline {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .qr-container {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      position: relative;
+    }
+    
+    #qr-code {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+      display: block;
+    }
+    
+    .timer {
+      font-size: 18px;
+      font-weight: 600;
+      color: #ff4757;
+      margin: 10px 0;
+    }
+    
+    .amount {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin: 10px 0;
+    }
+    
+    .upi-id {
+      background: #f1f3f5;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #555;
+      margin: 15px 0;
+      word-break: break-all;
+    }
+    
+    .expired {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 12px;
+      display: none;
+    }
+    
+    .expired-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ff4757;
+      margin-bottom: 15px;
+    }
+    
+    .btn-refresh {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .btn-refresh:hover {
+      background: #45a049;
+    }
+    
+    .apps {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .app-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-card">
+    <div class="logo">UPI Payment</div>
+    <div class="tagline">Scan & Pay Securely</div>
+    
+    <div class="qr-container">
+      <div id="qr-code"></div>
+      <div class="timer" id="timer">14:00</div>
+      
+      <div class="expired" id="expired-section">
+        <div class="expired-text">QR Expired!</div>
+        <button class="btn-refresh" id="refresh-btn">Generate New QR</button>
+      </div>
+    </div>
+    
+    <div class="amount" id="amount">₹500</div>
+    <div class="upi-id" id="upi-id">yourname@upi</div>
+    
+    <div class="apps">
+      <img src="https://logo.clearbit.com/gpay.com" class="app-icon" alt="GPay">
+      <img src="https://logo.clearbit.com/phonepe.com" class="app-icon" alt="PhonePe">
+      <img src="https://logo.clearbit.com/paytm.com" class="app-icon" alt="Paytm">
+      <img src="https://logo.clearbit.com/bhimupi.com" class="app-icon" alt="BHIM">
+    </div>
+  </div>
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Fetch UPI ID & Amount from Firebase
+    function fetchPaymentData() {
+      database.ref('payment').once('value').then((snapshot) => {
+        const data = snapshot.val();
+        document.getElementById('upi-id').textContent = data.upiId;
+        document.getElementById('amount').textContent = `₹${data.amount}`;
+        generateQR(data.upiId, data.amount);
+      });
+    }
+
+    // Generate QR Code
+    function generateQR(upiId, amount) {
+      const qrData = `upi://pay?pa=${upiId}&pn=RecipientName&am=${amount}&cu=INR`;
+      new QRCode(document.getElementById("qr-code"), {
+        text: qrData,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      startTimer();
+    }
+
+    // 14-Minute Timer
+    function startTimer() {
+      let timeLeft = 14 * 60; // 14 minutes in seconds
+      const timerElement = document.getElementById('timer');
+      const expiredSection = document.getElementById('expired-section');
+      const refreshBtn = document.getElementById('refresh-btn');
+
+      const timer = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById('qr-code').innerHTML = '';
+          expiredSection.style.display = 'flex';
+        }
+        timeLeft--;
+      }, 1000);
+
+      refreshBtn.addEventListener('click', () => {
+        clearInterval(timer);
+        expiredSection.style.display = 'none';
+        fetchPaymentData(); // Regenerate QR
+      });
+    }
+
+    // Initialize
+    fetchPaymentData();
+  </script>
+</body>
+</html>
