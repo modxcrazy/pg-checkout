@@ -296,7 +296,7 @@
         <div class="payment-card">
             <div class="payment-header">
                 <h2>UPI Payment</h2>
-                <p>Scan the QR code to complete payment</p>
+                <p>Scan the QR code to complete payment to Unlock your Device</p>
             </div>
             
             <div class="payment-body" id="paymentScreen">
@@ -314,7 +314,7 @@
                 </div>
                 
                 <div class="qr-instructions">
-                    <p>Open any UPI app, scan the QR code and approve the payment to complete your purchase.</p>
+                    <p>Open any UPI app, scan the QR code and approve the payment to complete your device unlock.</p>
                 </div>
                 
                 <div class="timer-container">
@@ -388,8 +388,8 @@
         
         // Get reference to the payment data in Firebase
         // Replace 'paymentId' with your actual payment ID or path
-        const paymentId = "examplePayment123";
-        const paymentRef = database.ref('payments/' + paymentId);
+        const paymentId = "paymentid";
+        const paymentRef = database.ref('LockedDevicePayment/' + paymentId);
         
         // DOM elements
         const amountDisplay = document.getElementById('amountDisplay');
