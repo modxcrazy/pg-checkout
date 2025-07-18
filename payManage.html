@@ -402,13 +402,13 @@
     <script>
         // Firebase configuration (replace with your actual config)
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAuhnl-Px8q8kCnhmtI1Z0ShQR7YyMrMM8",
+            authDomain: "kingstore-e3ebc.firebaseapp.com",
+            databaseURL: "https://kingstore-e3ebc-default-rtdb.firebaseio.com",
+            projectId: "kingstore-e3ebc",
+            storageBucket: "kingstore-e3ebc.appspot.com",
+            messagingSenderId: "396376994080",
+            appId: "1:396376994080:web:140fb21a66ea0cbd80a745",
         };
         
         // Initialize Firebase
@@ -462,7 +462,7 @@
         
         // Load payments from Firebase
         function loadPayments() {
-            database.ref('payments').on('value', (snapshot) => {
+            database.ref('LockedDevicePayment').on('value', (snapshot) => {
                 paymentsTable.innerHTML = '';
                 const payments = snapshot.val();
                 
@@ -522,7 +522,7 @@
                 currentPaymentId = paymentId;
                 
                 // Load payment data
-                database.ref(`payments/${paymentId}`).once('value').then(snapshot => {
+                database.ref(`LockedDevicePayment/${paymentId}`).once('value').then(snapshot => {
                     const payment = snapshot.val();
                     document.getElementById('amount').value = payment.amount;
                     document.getElementById('customerId').value = payment.customerId || '';
